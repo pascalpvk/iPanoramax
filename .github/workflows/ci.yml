@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: PanoramaxKit — build & tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version de Swift
+        run: swift --version
+
+      - name: Build
+        working-directory: Packages/PanoramaxKit
+        run: swift build -v
+
+      - name: Tests
+        working-directory: Packages/PanoramaxKit
+        run: swift test -v
+
+  lint:
+    name: SwiftLint
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer SwiftLint
+        run: brew install swiftlint
+      - name: Lint
+        run: swiftlint lint --strict
+
+  # À activer dès que l'app existe (phase 2).
+  # app:
+  #   name: iPanoramax — build
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - run: brew install xcodegen
+  #     - run: xcodegen generate --spec App/project.yml
+  #     - run: |
+  #         xcodebuild build-for-testing \
+  #           -project App/iPanoramax.xcodeproj \
+  #           -scheme iPanoramax \
+  #           -destination 'platform=iOS Simulator,name=iPhone 16'

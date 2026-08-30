@@ -1,0 +1,31 @@
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+!*.xcodeproj/project.pbxproj
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+*.moved-aside
+
+# Le projet est généré par XcodeGen depuis App/project.yml
+App/iPanoramax.xcodeproj/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Fastlane
+fastlane/report.xml
+fastlane/screenshots/
+fastlane/test_output/
+*.mobileprovision
+*.p12
+
+# macOS
+.DS_Store
+
+# Secrets
+.env
+Secrets.xcconfig
