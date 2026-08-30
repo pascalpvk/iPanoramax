@@ -1,0 +1,100 @@
+# XcodeGen — le .xcodeproj est généré, jamais versionné.
+#   brew install xcodegen && xcodegen generate --spec App/project.yml
+
+name: iPanoramax
+options:
+  bundleIdPrefix: net.vuylsteker
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: "" # à renseigner localement, hors dépôt
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+packages:
+  PanoramaxKit:
+    path: ../Packages/PanoramaxKit
+  # Ajoutés en phase 4
+  # MapLibre:
+  #   url: https://github.com/maplibre/maplibre-gl-native-distribution
+  #   from: 6.0.0
+
+targets:
+  iPanoramax:
+    type: application
+    platform: iOS
+    sources:
+      - path: iPanoramax
+    dependencies:
+      - package: PanoramaxKit
+    info:
+      path: iPanoramax/Info.plist
+      properties:
+        CFBundleDisplayName: iPanoramax
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+
+        # --- Autorisations ---
+        # Rédigées à la première personne, en expliquant l'usage : c'est ce que
+        # l'App Review lit, et c'est ce que l'utilisateur voit dans l'alerte.
+        NSCameraUsageDescription: >-
+          iPanoramax utilise l'appareil photo pour capturer les photos
+          géolocalisées que vous publierez sur l'instance Panoramax de votre
+          choix.
+        NSLocationWhenInUseUsageDescription: >-
+          Votre position est enregistrée dans chaque photo, afin que Panoramax
+          puisse la placer sur la carte. Sans elle, une photo ne peut pas être
+          publiée.
+        NSLocationAlwaysAndWhenInUseUsageDescription: >-
+          La position continue d'être enregistrée quand l'écran se verrouille,
+          pour ne pas interrompre une séquence en cours. Aucune photo n'est
+          prise en arrière-plan.
+        NSMotionUsageDescription: >-
+          Les capteurs de mouvement servent à mesurer l'orientation de
+          l'appareil et à guider la capture panoramique.
+        NSPhotoLibraryAddUsageDescription: >-
+          Permet d'enregistrer dans votre photothèque les clichés que vous
+          souhaitez conserver.
+
+        UIBackgroundModes:
+          - location   # trace GPS pendant une séquence, écran verrouillé
+          - processing # reprise de la file d'envoi
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.vuylsteker.ipanoramax
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+
+  iPanoramaxTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [iPanoramaxTests]
+    dependencies:
+      - target: iPanoramax
+
+  iPanoramaxUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [iPanoramaxUITests]
+    dependencies:
+      - target: iPanoramax
+
+schemes:
+  iPanoramax:
+    build:
+      targets:
+        iPanoramax: all
+    test:
+      targets: [iPanoramaxTests, iPanoramaxUITests]
+      gatherCoverageData: true

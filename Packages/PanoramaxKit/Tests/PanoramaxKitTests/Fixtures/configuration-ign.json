@@ -1,0 +1,41 @@
+{
+  "auth": {
+    "enabled": true,
+    "enforce_tos_acceptance": true,
+    "registration_is_open": true,
+    "user_profile": {
+      "url": "https://panoramax.ign.fr/oauth/realms/geovisio/account/#/personal-info",
+      "use_iframe": false
+    }
+  },
+  "color": "#bf360c",
+  "defaults": {
+    "collaborative_metadata": false,
+    "default_visibility": "anyone",
+    "duplicate_distance": 1.0,
+    "duplicate_rotation": 60,
+    "split_distance": 100,
+    "split_time": 300.0
+  },
+  "description": {
+    "label": "The open source photo mapping solution",
+    "langs": { "en": "The open source photo mapping solution" }
+  },
+  "email": "panoramax@panoramax.fr",
+  "geo_coverage": {
+    "label": "<b>Photos must be located in France.</b>",
+    "langs": {
+      "en": "<b>Photos must be located in France.</b> The photos you send to the IGN must be taken on French territory (including overseas territories) and outside certain sensitive areas such as military terrain.",
+      "fr": "<b>Les photos doivent être localisées en France.</b> Les photos que vous envoyez à l'IGN doivent forcément être prises sur le territoire français (ce qui inclut les territoires ultra-marins) et en dehors de certaines zones sensibles comme les terrains militaires."
+    }
+  },
+  "license": {
+    "id": "etalab-2.0",
+    "url": "https://alliance.numerique.gouv.fr/licence-ouverte-open-licence/"
+  },
+  "logo": "https://design-system.ign.fr/img/styleguide/sg_logos/Logo_IGN_svg/IGN_logo-simplifie_Q.svg",
+  "name": { "label": "IGN", "langs": { "en": "IGN", "fr": "IGN" } },
+  "pages": ["terms-of-service", "end-user-license-agreement"],
+  "version": "2.15.1",
+  "visibility": { "possible_values": ["anyone", "owner-only"] }
+}
