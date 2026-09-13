@@ -14,7 +14,8 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) · versionnage
 - `Tools/check.sh` : build, tests et lint en une commande, journal dans
   `check.log`.
 - `ImageMetadataKit` : modèle de capture, construction du dictionnaire EXIF/GPS
-  pour ImageIO, écriture dans un JPEG sans recompression.
+  pour ImageIO, écriture dans un JPEG sans recompression, et injection d'un
+  segment APP1 XMP pour l'attitude de l'appareil (`Xmp.Camera.Yaw/Pitch/Roll`).
 
 ### Corrigé
 - L'attente de revendication d'un jeton traite le **403** rendu par OSM-FR

@@ -27,7 +27,12 @@ public enum ImageMetadataWriter {
     /// n'écrase pas ce que l'appareil a écrit (exposition, balance des blancs,
     /// profil colorimétrique).
     public static func writingMetadata(_ metadata: CaptureMetadata, into jpeg: Data) throws -> Data {
-        try writingProperties(ExifMetadataBuilder.properties(for: metadata), into: jpeg)
+        // EXIF d'abord, XMP ensuite : la réécriture par ImageIO ne préserve pas
+        // les segments applicatifs qu'elle ne connaît pas. Injecter le XMP avant
+        // reviendrait à le voir disparaître.
+        let withExif = try writingProperties(ExifMetadataBuilder.properties(for: metadata), into: jpeg)
+        guard let packet = XMPInjector.packet(for: metadata) else { return withExif }
+        return try XMPInjector.injecting(packet, into: withExif)
     }
 
     /// Variante prenant un dictionnaire déjà construit.
