@@ -47,6 +47,7 @@ Infrastructure PanoramaxKit · ImageMetadataKit · GeoKit
 |---|---|
 | `PanoramaxKit` | Client de l'API Panoramax (STAC API 1.0.0 + extensions) |
 | `ImageMetadataKit` | Écriture EXIF et injection XMP dans le JPEG |
+| `Tools/panoramax-probe` | Sonde en ligne de commande contre une instance réelle |
 | `GeoKit` | `CoreLocation`, `CoreMotion`, logique de déclenchement |
 | `UploadEngine` | File d'envoi persistée, session background, reprises |
 | `Persistence` | SwiftData : sessions, clichés, tâches d'envoi |
@@ -126,8 +127,8 @@ idempotent, et une coupure réseau se rejoue sans créer de doublon.
 
 | Phase | Objet | Livrable |
 |---|---|---|
-| 0 | Fondations, CI, `PanoramaxKit` (config + auth) | Un jeton obtenu depuis une démo minimale |
-| 1 | `ImageMetadataKit` — EXIF et XMP | Photo fabriquée par le code, acceptée à l'ingestion |
+| 0 ✅ | Fondations, CI, `PanoramaxKit` (config + auth) | Authentification validée contre `panoramax.openstreetmap.fr` |
+| 1 🚧 | `ImageMetadataKit` — EXIF et XMP | Photo fabriquée par le code, acceptée à l'ingestion |
 | 2 | Capture de séquence | 500 m à pied → séquence propre |
 | 3 | Envoi fiable en tâche de fond | 200 photos envoyées, app en arrière-plan |
 | 4 | Carte MapLibre et multi-instances | Bascule OSM-FR ↔ IGN |

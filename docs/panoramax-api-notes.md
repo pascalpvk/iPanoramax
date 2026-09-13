@@ -39,6 +39,15 @@ L'intérêt décisif : **aucune inscription préalable de l'application** n'est
 nécessaire auprès de chaque instance. Le même code fonctionne sur la vingtaine
 d'instances publiques.
 
+> **Vérifié sur le terrain, 13 septembre 2026.** Un jeton généré mais pas
+> encore revendiqué fait répondre `GET /api/users/me` en **403**, pas en 401,
+> sur `panoramax.openstreetmap.fr`. C'est cohérent — le jeton est signé et
+> valide, il lui manque seulement un compte rattaché, donc « droits
+> insuffisants » plutôt que « authentification requise » — mais la
+> documentation ne le dit pas. Une boucle d'attente qui ne réessaie que sur 401
+> prend donc l'attente normale pour un refus définitif.
+> Voir `PanoramaxError.meansTokenNotYetClaimed`.
+
 Stockage du JWT : Keychain, avec `kSecAttrAccessibleAfterFirstUnlock` — il doit
 rester lisible par la session d'envoi en tâche de fond, qui peut s'exécuter
 appareil verrouillé.

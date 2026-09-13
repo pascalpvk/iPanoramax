@@ -9,6 +9,9 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 LOG="$PWD/check.log"
 
+PACKAGES=(Packages/PanoramaxKit Packages/ImageMetadataKit)
+TOOLS=(Tools/panoramax-probe)
+
 {
   echo "=== iPanoramax — vérification locale ==="
   date '+%Y-%m-%d %H:%M:%S'
@@ -18,17 +21,20 @@ LOG="$PWD/check.log"
   echo "### swift --version"
   swift --version || status=1
 
-  echo
-  echo "### PanoramaxKit — build"
-  (cd Packages/PanoramaxKit && swift build) || status=1
+  for package in "${PACKAGES[@]}"; do
+    echo
+    echo "### $(basename "$package") — build"
+    (cd "$package" && swift build) || status=1
+    echo
+    echo "### $(basename "$package") — tests"
+    (cd "$package" && swift test) || status=1
+  done
 
-  echo
-  echo "### PanoramaxKit — tests"
-  (cd Packages/PanoramaxKit && swift test) || status=1
-
-  echo
-  echo "### panoramax-probe — build"
-  (cd Tools/panoramax-probe && swift build) || status=1
+  for tool in "${TOOLS[@]}"; do
+    echo
+    echo "### $(basename "$tool") — build"
+    (cd "$tool" && swift build) || status=1
+  done
 
   echo
   echo "### SwiftLint"

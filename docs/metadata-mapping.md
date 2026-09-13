@@ -17,6 +17,7 @@ test dans `ImageMetadataKitTests`.
 | Date UTC | `GPSDateStamp` (`AAAA:MM:JJ`) | chaîne | `CLLocation.timestamp` | canal le plus fiable, car sans ambiguïté de fuseau |
 | Heure UTC | `GPSTimeStamp` | 3 rationnels h/m/s | `CLLocation.timestamp` | |
 | Date locale | `DateTimeOriginal` (`AAAA:MM:JJ HH:MM:SS`) | chaîne | horloge de l'appareil | écrit en complément, jamais seul |
+| Décalage | `OffsetTimeOriginal` (`+HH:MM`) | chaîne | `TimeZone.secondsFromGMT` | réponse d'EXIF 2.31 à l'ambiguïté ci-dessous |
 
 > **Piège classique.** `DateTimeOriginal` est en heure locale *sans* fuseau.
 > Écrire uniquement ce tag rend l'horodatage ambigu, et Panoramax privilégie
