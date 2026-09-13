@@ -199,3 +199,22 @@ extension URLRequest {
         return data
     }
 }
+
+/// Collecteur protégé par verrou, pour observer ce qui se passe dans une
+/// closure `@Sendable` — un tableau local mutable ne s'y capture pas.
+final class ErrorLog: @unchecked Sendable {
+    private let lock = NSLock()
+    private var errors: [PanoramaxError] = []
+
+    func append(_ error: PanoramaxError) {
+        lock.lock()
+        defer { lock.unlock() }
+        errors.append(error)
+    }
+
+    var all: [PanoramaxError] {
+        lock.lock()
+        defer { lock.unlock() }
+        return errors
+    }
+}
