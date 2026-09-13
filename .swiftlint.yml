@@ -27,6 +27,11 @@ line_length:
   error: 160
   ignores_comments: true
 
+# Un `enum CodingKeys` dans un type imbriqué fait deux niveaux : c'est la
+# forme idiomatique d'un modèle Codable structuré, pas une odeur de code.
+nesting:
+  type_level: 2
+
 type_body_length:
   warning: 300
 

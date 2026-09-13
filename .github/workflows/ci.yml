@@ -27,6 +27,10 @@ jobs:
         working-directory: Packages/PanoramaxKit
         run: swift test -v
 
+      - name: Build de panoramax-probe
+        working-directory: Tools/panoramax-probe
+        run: swift build -v
+
   lint:
     name: SwiftLint
     runs-on: macos-latest

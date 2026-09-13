@@ -29,3 +29,6 @@ fastlane/test_output/
 # Secrets
 .env
 Secrets.xcconfig
+
+# Journal de Tools/check.sh
+check.log
