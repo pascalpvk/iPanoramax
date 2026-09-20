@@ -135,9 +135,17 @@ public actor PanoramaxClient {
     public func raw(
         _ method: String = "GET",
         path: String,
+        body: Data? = nil,
+        contentType: String? = nil,
         authenticated: Bool = true
     ) async throws -> PanoramaxRawResponse {
-        let request = makeRequest(method, path: path, authenticated: authenticated)
+        let request = makeRequest(
+            method,
+            path: path,
+            body: body,
+            contentType: contentType,
+            authenticated: authenticated
+        )
         let data: Data
         let response: URLResponse
         do {

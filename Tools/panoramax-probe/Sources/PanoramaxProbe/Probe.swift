@@ -202,6 +202,7 @@ struct Probe {
           --keep              ne pas supprimer la séquence après l'essai
           --public            accepter une séquence publique quand l'instance
                               ne sait pas masquer un essai
+          --token <jwt>       utiliser ce jeton plutôt que celui mémorisé
           --lat --lon --alt   position à inscrire  (défaut : Tour Eiffel)
           --heading           cap de visée en degrés
           --title             titre de l'upload set

@@ -9,7 +9,7 @@ import Foundation
 struct Arguments {
 
     /// Options attendant une valeur ; tout autre `--xxx` est un drapeau.
-    static let valued: Set<String> = ["lat", "lon", "alt", "heading", "title"]
+    static let valued: Set<String> = ["lat", "lon", "alt", "heading", "title", "token"]
 
     private(set) var positional: [String] = []
     private(set) var flags: Set<String> = []

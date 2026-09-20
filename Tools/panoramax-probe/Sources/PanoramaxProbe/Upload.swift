@@ -57,10 +57,19 @@ enum UploadProbe {
 
         // --- 3. Envoi ----------------------------------------------------
 
-        guard let entry = TokenStore().entry(for: host) else {
+        // --token permet de comparer un jeton émis par l'interface web au nôtre,
+        // issu du flux generate/claim. Si l'un passe et pas l'autre, le problème
+        // tient au jeton et non à la requête.
+        let token: String
+        if let provided = arguments.options["token"] {
+            token = provided
+            print("Jeton fourni en ligne de commande.")
+        } else if let entry = TokenStore().entry(for: host) {
+            token = entry.jwt
+        } else {
             Probe.fail("Aucun jeton pour \(host). Lance d'abord : panoramax-probe login \(host)")
         }
-        let client = PanoramaxClient(instance: instance, token: entry.jwt, userAgent: Probe.userAgent)
+        let client = PanoramaxClient(instance: instance, token: token, userAgent: Probe.userAgent)
 
         print("\n--- Envoi sur \(host) ---")
 
@@ -68,6 +77,7 @@ enum UploadProbe {
         // nos suppositions. L'application devra faire exactement pareil.
         let configuration = try await client.configuration()
         let allowed = configuration.visibility?.possibleValues ?? []
+        print("Version de l'API      \(configuration.version ?? "non déclarée")")
         print("Licence des photos    \(configuration.license?.id ?? "non déclarée")")
         print("Visibilités acceptées \(allowed.isEmpty ? "non déclarées" : allowed.joined(separator: ", "))")
 
@@ -230,6 +240,21 @@ enum UploadProbe {
         if let response = try? await client.raw(path: "users/me") {
             print("\nGET /api/users/me → HTTP \(response.statusCode)")
             print(String(response.body.prefix(800)))
+        }
+
+        // Les en-têtes d'un 500 portent parfois un identifiant de requête :
+        // c'est ce que l'équipe Panoramax demandera pour retrouver la trace.
+        let payload = Data(#"{"title":"iPanoramax test"}"#.utf8)
+        if let response = try? await client.raw(
+            "POST",
+            path: "upload_sets",
+            body: payload,
+            contentType: "application/json"
+        ) {
+            print("\nPOST /api/upload_sets → HTTP \(response.statusCode)")
+            for (key, value) in response.headers.sorted(by: { $0.key < $1.key }) {
+                print("  \(key): \(value)")
+            }
         }
 
         print("\nEssai de l'ancienne route POST /api/collections :")
