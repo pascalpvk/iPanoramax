@@ -82,14 +82,23 @@ POST /api/upload_sets            Content-Type: application/json
 
 Réponse : `201`, en-tête `Location`, et l'UUID dans le corps.
 
-> **Vérifié sur le terrain, 20 septembre 2026.** `POST /api/upload_sets` peut
-> rendre un **500** avec une page d'erreur générique, sans nommer le champ en
-> cause. Un corps réduit au seul `{"title": "…"}` passe. Instance testée :
-> `panoramax.openstreetmap.fr`, API 2.15.1-22-gf754cc9.
+> **Vérifié sur le terrain, 20 septembre 2026 — bug serveur.**
+> Envoyer le champ `user_agent` à `POST /api/upload_sets` fait rendre un **500**
+> par l'instance `panoramax.openstreetmap.fr` (API 2.15.1-22-gf754cc9). Le champ
+> figure pourtant dans la spécification OpenAPI de la route. La même requête
+> sans lui est acceptée.
 >
-> La page d'erreur ne distingue pas « corps refusé » de « serveur en panne » :
-> en cas de 500 sur cette route, réduire le corps champ à champ est le seul
-> moyen de savoir. `panoramax-probe upload` le fait automatiquement.
+> Valeur testée : `panoramax-probe (iPanoramax)` — parenthèses et espaces. On ne
+> sait pas encore si c'est le champ ou sa valeur ; l'échelon « user_agent
+> simple » de `panoramax-probe upload` le dira.
+>
+> **iPanoramax n'envoie donc pas `user_agent`** jusqu'à ce que ce soit tranché.
+> À signaler à l'équipe Panoramax : un 500 sur un champ documenté est un bug
+> serveur, pas une particularité à contourner en silence.
+>
+> Plus généralement, la page d'erreur d'un 500 ne distingue pas « corps refusé »
+> de « serveur en panne ». Réduire le corps champ à champ est le seul moyen de
+> savoir, et `panoramax-probe upload` le fait automatiquement.
 
 ### 2. Verser les fichiers
 

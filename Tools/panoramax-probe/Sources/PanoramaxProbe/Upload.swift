@@ -105,12 +105,14 @@ enum UploadProbe {
             bodyDirectory: scratch
         )
         let contentType = prepared.request.value(forHTTPHeaderField: "Content-Type") ?? ""
-        try await client.uploadPreparedFile(
+        let bodySize = (try? Data(contentsOf: prepared.bodyFileURL).count) ?? 0
+        print("Corps multipart \(octets(bodySize)), picture_id \(pictureID.uuidString)")
+        let answer = try await client.uploadPreparedFile(
             uploadSetID: uploadSet.id,
             bodyFileURL: prepared.bodyFileURL,
             contentType: contentType
         )
-        print("Fichier envoyé, picture_id \(pictureID.uuidString)")
+        print("Réponse du serveur : \(String(answer.prefix(600)))")
 
         try await client.completeUploadSet(id: uploadSet.id)
 
@@ -167,13 +169,6 @@ enum UploadProbe {
         // champ présent dans les six tentatives ratées et absent du POST brut
         // qui, lui, a été accepté.
         var attempts: [(String, UploadSetRequest)] = [
-            ("complet", UploadSetRequest(
-                title: title,
-                estimatedNbFiles: 1,
-                sortMethod: .timeAscending,
-                visibility: visibility,
-                userAgent: Probe.userAgent
-            )),
             ("sans user_agent", UploadSetRequest(
                 title: title,
                 estimatedNbFiles: 1,
@@ -374,11 +369,27 @@ enum UploadProbe {
 
     // MARK: - Suivi et verdict
 
+    /// Suit le traitement, en montrant d'abord la réponse brute.
+    ///
+    /// Des compteurs à zéro peuvent signifier deux choses opposées : le serveur
+    /// n'a rien reçu, ou notre modèle ne sait pas lire sa réponse. Seul le JSON
+    /// brut tranche, et tant qu'il n'a pas tranché, les compteurs ne valent
+    /// rien.
     static func waitForProcessing(
         _ client: PanoramaxClient,
         id: UUID,
-        attempts: Int = 40
+        attempts: Int = 12
     ) async throws -> UploadSet {
+        if let response = try? await client.raw(path: "upload_sets/\(id.uuidString)") {
+            print("\nGET /api/upload_sets/\(id.uuidString) → HTTP \(response.statusCode)")
+            print(String(response.body.prefix(1600)))
+        }
+        if let response = try? await client.raw(path: "upload_sets/\(id.uuidString)/files") {
+            print("\nGET …/files → HTTP \(response.statusCode)")
+            print(String(response.body.prefix(1600)))
+        }
+
+        print()
         var latest = try await client.uploadSet(id: id)
         for _ in 1...attempts {
             if latest.ready == true { return latest }
@@ -390,6 +401,7 @@ enum UploadProbe {
             try await Task.sleep(for: .seconds(3))
             latest = try await client.uploadSet(id: id)
         }
+        print("  Toujours pas prêt après \(attempts) essais — voir le JSON ci-dessus.")
         return latest
     }
 

@@ -30,18 +30,23 @@ extension PanoramaxClient {
     /// la file d'envoi de l'application.
     ///
     /// - Parameter bodyFileURL: fichier produit par ``MultipartBodyBuilder``.
+    /// - Returns: la réponse du serveur, telle quelle. Un envoi accepté ne dit
+    ///   pas encore ce que le serveur a compris du fichier : c'est cette
+    ///   réponse qui le dit.
+    @discardableResult
     public func uploadPreparedFile(
         uploadSetID: UUID,
         bodyFileURL: URL,
         contentType: String
-    ) async throws {
+    ) async throws -> String {
         var request = makeRequest(
             "POST",
             path: "upload_sets/\(uploadSetID.uuidString)/files",
             contentType: contentType
         )
         request.httpBody = try Data(contentsOf: bodyFileURL)
-        try await send(request)
+        let data = try await send(request)
+        return String(data: data, encoding: .utf8) ?? "<\(data.count) octets>"
     }
 
     /// Construit la requête d'envoi sans l'exécuter, pour la confier à une
