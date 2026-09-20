@@ -62,8 +62,27 @@ struct UploadSetsAPITests {
         #expect(!json.keys.contains("duplicate_distance"))
         #expect(!json.keys.contains("no_split"))
 
-        // Rempli automatiquement à partir du client.
-        #expect(json["user_agent"] as? String == "iPanoramax/tests")
+        // Plus rempli automatiquement : le client envoie ce que l'appelant a
+        // écrit, rien de plus. Une version antérieure complétait `user_agent`
+        // en douce — et ce champ fait rendre un 500 par l'instance OSM-FR.
+        #expect(!json.keys.contains("user_agent"))
+    }
+
+    @Test("Le user_agent n'est envoyé que si l'appelant le demande")
+    func sendsUserAgentOnlyWhenAsked() async throws {
+        let network = MockNetwork()
+        network.stub { _ in .json(Self.uploadSetJSON, status: 201) }
+        let client = network.makeClient(token: "header.payload.signature")
+
+        _ = try await client.createUploadSet(
+            UploadSetRequest(title: "Chemin des Vignes", userAgent: "iPanoramax/1.0")
+        )
+
+        let sent = try #require(network.requests.first)
+        let body = try #require(sent.recordedBody)
+        let object = try JSONSerialization.jsonObject(with: body)
+        let json = try #require(object as? [String: Any])
+        #expect(json["user_agent"] as? String == "iPanoramax/1.0")
     }
 
     @Test("L'état d'un upload set est décodé, fractions de seconde comprises")
