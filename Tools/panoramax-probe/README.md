@@ -42,14 +42,21 @@ swift run panoramax-probe upload ~/photos/photo.jpg --send \
 |---|---|
 | `--send` | envoie réellement ; sans lui, tout reste local |
 | `--keep` | conserve la séquence au lieu de la supprimer |
+| `--public` | accepte une séquence publique quand l'instance ne propose pas `owner-only` |
 | `--lat` `--lon` `--alt` | position à inscrire (défaut : Tour Eiffel) |
 | `--heading` | cap de visée en degrés |
 | `--title` | titre de l'upload set |
 
-> **Un envoi crée de la donnée réelle sur un commun partagé.** L'essai part donc
-> en visibilité `owner-only`, et la séquence est supprimée à la fin sauf
-> `--keep`. Si la suppression échoue, l'outil le dit et donne l'identifiant à
-> retirer à la main.
+> **Un envoi crée de la donnée réelle sur un commun partagé.** L'outil lit
+> d'abord `/api/configuration` : si l'instance déclare `owner-only`, l'essai
+> part en visibilité masquée. Sinon il **s'arrête** plutôt que de créer une
+> séquence publique à ton insu — `--public` force le passage. Dans tous les cas
+> la séquence est supprimée à la fin, sauf `--keep` ; si la suppression échoue,
+> l'outil donne l'identifiant à retirer à la main.
+
+Quand la création d'un upload set échoue, l'outil réessaie en retirant les
+champs un à un et indique lequel débloque la situation : une erreur 500 rend
+une page générique qui ne nomme pas le champ fautif.
 
 ## Stockage du jeton
 

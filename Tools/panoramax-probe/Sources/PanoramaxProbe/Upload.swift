@@ -63,12 +63,18 @@ enum UploadProbe {
         let client = PanoramaxClient(instance: instance, token: entry.jwt, userAgent: Probe.userAgent)
 
         print("\n--- Envoi sur \(host) ---")
-        print("Visibilité : owner-only — un essai n'a pas à devenir de la donnée publique.")
+
+        // C'est la configuration de l'instance qui dit ce qu'elle accepte, pas
+        // nos suppositions. L'application devra faire exactement pareil.
+        let configuration = try await client.configuration()
+        let allowed = configuration.visibility?.possibleValues ?? []
+        print("Licence des photos    \(configuration.license?.id ?? "non déclarée")")
+        print("Visibilités acceptées \(allowed.isEmpty ? "non déclarées" : allowed.joined(separator: ", "))")
+
+        let visibility = chooseVisibility(allowed: allowed, arguments: arguments)
 
         let title = arguments.options["title"] ?? "iPanoramax — essai \(Date().formatted(.iso8601))"
-        let uploadSet = try await client.createUploadSet(
-            UploadSetRequest(title: title, estimatedNbFiles: 1, visibility: .ownerOnly)
-        )
+        let uploadSet = try await createUploadSet(client, title: title, visibility: visibility)
         print("Upload set \(uploadSet.id.uuidString)")
 
         let scratch = FileManager.default.temporaryDirectory
@@ -110,6 +116,102 @@ enum UploadProbe {
             return
         }
         await cleanUp(client, uploadSet: final, host: host)
+    }
+
+    // MARK: - Visibilité
+
+    /// Un essai ne doit pas devenir de la donnée publique. Si l'instance ne
+    /// sait pas masquer une séquence, on le dit et on s'arrête : mieux vaut
+    /// refuser que tenir une promesse qu'on ne peut pas tenir.
+    static func chooseVisibility(allowed: [String], arguments: Arguments) -> Visibility? {
+        if allowed.contains(Visibility.ownerOnly.rawValue) {
+            print("Envoi en owner-only — invisible des autres contributeurs.")
+            return .ownerOnly
+        }
+        guard arguments.has("public") else {
+            Probe.fail("""
+                Cette instance ne déclare pas la visibilité « owner-only ».
+                L'essai créerait donc une séquence PUBLIQUE.
+
+                Relance avec --public si c'est bien ce que tu veux. Elle sera
+                supprimée à la fin, sauf --keep.
+                """)
+        }
+        print("--public : la séquence sera PUBLIQUE le temps de l'essai.")
+        return nil
+    }
+
+    // MARK: - Création de l'upload set
+
+    /// Crée l'upload set, en réduisant la requête tant qu'elle est refusée.
+    ///
+    /// Un 500 sur cette route rend une page d'erreur générique : elle ne dit pas
+    /// quel champ pose problème. Plutôt que de deviner, on retire les champs un
+    /// à un et on rapporte celui dont le retrait débloque la situation.
+    static func createUploadSet(
+        _ client: PanoramaxClient,
+        title: String,
+        visibility: Visibility?
+    ) async throws -> UploadSet {
+        var attempts: [(String, UploadSetRequest)] = [
+            ("complet", UploadSetRequest(
+                title: title,
+                estimatedNbFiles: 1,
+                sortMethod: .timeAscending,
+                visibility: visibility,
+                userAgent: Probe.userAgent
+            ))
+        ]
+        if visibility != nil {
+            attempts.append(("sans visibility", UploadSetRequest(
+                title: title,
+                estimatedNbFiles: 1,
+                sortMethod: .timeAscending,
+                userAgent: Probe.userAgent
+            )))
+        }
+        attempts.append(("sans sort_method", UploadSetRequest(
+            title: title,
+            estimatedNbFiles: 1,
+            sortMethod: nil,
+            userAgent: Probe.userAgent
+        )))
+        attempts.append(("sans user_agent", UploadSetRequest(
+            title: title,
+            estimatedNbFiles: 1,
+            sortMethod: nil
+        )))
+        attempts.append(("titre seul", UploadSetRequest(title: title, sortMethod: nil)))
+
+        var lastError: Error?
+        for (index, attempt) in attempts.enumerated() {
+            let (label, request) = attempt
+            print("\n  tentative « \(label) »")
+            print("  corps  \(body(of: request))")
+            do {
+                let uploadSet = try await client.createUploadSet(request)
+                print("  → acceptée.")
+                if index > 0 {
+                    let previous = attempts[index - 1].0
+                    print("  Le champ absent ici et présent dans « \(previous) » est en cause.")
+                }
+                return uploadSet
+            } catch {
+                print("  → refusée : \(Probe.describe(error))")
+                lastError = error
+            }
+        }
+        throw lastError ?? PanoramaxError.server(status: 500, message: nil)
+    }
+
+    /// Le corps réellement envoyé, pour qu'un refus soit lisible sans deviner.
+    static func body(of request: UploadSetRequest) -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        guard let data = try? encoder.encode(request),
+              let text = String(data: data, encoding: .utf8)
+        else { return "— illisible —" }
+        return text
     }
 
     // MARK: - Métadonnées
