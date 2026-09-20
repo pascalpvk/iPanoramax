@@ -95,6 +95,24 @@ extension PanoramaxClient {
         )
     }
 
+    /// Ancienne API d'envoi : crée directement une séquence.
+    ///
+    /// Conservée comme voie de repli et comme sonde. Les upload sets restent le
+    /// chemin nominal (voir `docs/adr/0001`), mais toutes les instances ne les
+    /// servent pas forcément : savoir laquelle des deux routes répond est la
+    /// première question à poser quand un envoi échoue.
+    public func createCollection(title: String) async throws -> PanoramaxCollection {
+        try await send(
+            makeRequest(
+                "POST",
+                path: "collections",
+                body: try encode(["title": title]),
+                contentType: "application/json"
+            ),
+            as: PanoramaxCollection.self
+        )
+    }
+
     /// Supprime une séquence et les photos qu'elle contient.
     ///
     /// Indispensable à tout essai contre une instance publique : ce qu'on y

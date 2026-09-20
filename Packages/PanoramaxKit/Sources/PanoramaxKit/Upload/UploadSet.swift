@@ -148,3 +148,11 @@ public struct UploadSetFile: Codable, Sendable, Hashable {
 struct UploadSetFilesResponse: Codable, Sendable {
     let files: [UploadSetFile]
 }
+
+/// Séquence telle que la rend l'ancienne API d'envoi (`POST /api/collections`).
+public struct PanoramaxCollection: Codable, Sendable {
+    /// Rendu en chaîne et non en UUID : un identifiant inattendu ne doit pas
+    /// faire échouer le décodage d'une réponse par ailleurs exploitable.
+    public let id: String
+    public let title: String?
+}

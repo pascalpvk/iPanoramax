@@ -182,6 +182,10 @@ enum UploadProbe {
             sortMethod: nil
         )))
         attempts.append(("titre seul", UploadSetRequest(title: title, sortMethod: nil)))
+        // Le titre était identique partout jusqu'ici : un accent ou un tiret
+        // cadratin mal géré côté serveur resterait invisible à une bisection
+        // qui ne fait varier que les autres champs.
+        attempts.append(("titre ASCII", UploadSetRequest(title: "iPanoramax test", sortMethod: nil)))
 
         var lastError: Error?
         for (index, attempt) in attempts.enumerated() {
@@ -201,7 +205,45 @@ enum UploadProbe {
                 lastError = error
             }
         }
+        await investigate(client)
         throw lastError ?? PanoramaxError.server(status: 500, message: nil)
+    }
+
+    /// Quand aucun corps ne passe, le problème n'est pas dans le corps.
+    ///
+    /// Trois questions, dans cet ordre : le compte a-t-il accepté les
+    /// conditions d'utilisation de l'instance, que renvoie `/users/me` en
+    /// entier, et l'ancienne route d'envoi répond-elle mieux ?
+    static func investigate(_ client: PanoramaxClient) async {
+        print("\n--- Aucun corps accepté : la cause est ailleurs ---")
+
+        if let configuration = try? await client.configuration() {
+            let tos = configuration.auth?.enforceTosAcceptance == true
+            print("\nConditions d'utilisation à accepter : \(tos ? "OUI" : "non")")
+            if tos {
+                print("Si tu ne les as jamais acceptées sur le site, c'est la piste")
+                print("la plus probable : connecte-toi sur le site de l'instance,")
+                print("accepte les conditions, puis relance cet essai.")
+            }
+        }
+
+        if let response = try? await client.raw(path: "users/me") {
+            print("\nGET /api/users/me → HTTP \(response.statusCode)")
+            print(String(response.body.prefix(800)))
+        }
+
+        print("\nEssai de l'ancienne route POST /api/collections :")
+        do {
+            let collection = try await client.createCollection(title: "iPanoramax test")
+            print("  → acceptée, séquence \(collection.id)")
+            print("  Les upload sets sont donc hors service sur cette instance,")
+            print("  pas l'envoi en général. À signaler à l'équipe Panoramax.")
+            try? await client.deleteCollection(id: UUID(uuidString: collection.id) ?? UUID())
+        } catch {
+            print("  → refusée : \(Probe.describe(error))")
+            print("  Les deux routes échouent : le problème tient au compte ou")
+            print("  à l'instance, pas à la requête.")
+        }
     }
 
     /// Le corps réellement envoyé, pour qu'un refus soit lisible sans deviner.
