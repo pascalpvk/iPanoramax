@@ -101,7 +101,7 @@ enum UploadProbe {
         // --- 4. Verdict du serveur ---------------------------------------
 
         let final = try await waitForProcessing(client, id: uploadSet.id)
-        try report(client, uploadSet: final, host: host)
+        try await report(client, uploadSet: final, host: host)
 
         // --- 5. Nettoyage -------------------------------------------------
 

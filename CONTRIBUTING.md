@@ -47,6 +47,32 @@ projet pour la communauté Panoramax.
 3. **Aucun SDK d'analytique ni de suivi tiers.** L'app ne transmet rien d'autre
    que ce que l'utilisateur publie délibérément.
 
+## Pièges rencontrés, à ne pas redécouvrir
+
+**`#require` et les fonctions qui lancent.** La macro réécrit l'appel le plus
+externe dans une closure, et c'est cette closure qui doit porter le `try` :
+
+```swift
+// Ne compile pas : extractingPacket lance, la closure interne n'est pas marquée
+let packet = try #require(XMPInjector.extractingPacket(from: jpeg))
+
+// Correct, et plus lisible
+let extracted = try XMPInjector.extractingPacket(from: jpeg)
+let packet = try #require(extracted)
+```
+
+Les *arguments*, eux, sont évalués à l'extérieur : `#require(String(data: try
+Data(contentsOf: url), encoding: .utf8))` compile très bien. Seule la fonction
+appelée compte.
+
+**Comparer un `Any?` à `nil`.** `properties["{GPS}"] == nil` ne compile pas —
+`Any` n'est pas `Equatable`. Interroger les clés : `!properties.keys.contains(…)`.
+
+**`.serialized` ne sérialise qu'une suite.** Les suites tournent en parallèle
+entre elles. Un registre partagé entre suites produit des échecs déroutants, où
+un test lit les requêtes d'un autre. L'isolation doit être structurelle — voir
+`MockNetwork`, qui donne un hôte unique à chaque test.
+
 ## Ajouter une dépendance
 
 Elles se justifient au cas par cas. À ce jour, une seule est prévue :

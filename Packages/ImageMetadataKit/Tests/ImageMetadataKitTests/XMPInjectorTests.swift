@@ -57,7 +57,8 @@ struct XMPInjectionTests {
         let packet = XMPInjector.packet(for: XMPPacketTests.attitude, toolkit: "iPanoramax")
 
         let written = try XMPInjector.injecting(packet, into: jpeg)
-        let read = try #require(XMPInjector.extractingPacket(from: written))
+        let extracted = try XMPInjector.extractingPacket(from: written)
+        let read = try #require(extracted)
         #expect(read == packet)
     }
 
@@ -80,7 +81,8 @@ struct XMPInjectionTests {
         let twiceCount = try Self.xmpSegments(in: twice).count
         #expect(onceCount == 1)
         #expect(twiceCount == 1)
-        let read = try #require(XMPInjector.extractingPacket(from: twice))
+        let extracted = try XMPInjector.extractingPacket(from: twice)
+        let read = try #require(extracted)
         #expect(read.contains("Camera:Yaw=\"200.0000\""))
         #expect(!read.contains("Camera:Yaw=\"10.0000\""))
     }
@@ -128,7 +130,8 @@ struct XMPInjectionTests {
 
         let written = try ImageMetadataWriter.writingMetadata(metadata, into: try SampleJPEG.make())
 
-        let packet = try #require(XMPInjector.extractingPacket(from: written))
+        let extracted = try XMPInjector.extractingPacket(from: written)
+        let packet = try #require(extracted)
         #expect(packet.contains("Camera:Yaw=\"137.4200\""))
 
         let properties = try ImageMetadataWriter.readingProperties(from: written)
