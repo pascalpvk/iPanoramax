@@ -6,9 +6,12 @@ extension PanoramaxClient {
 
     /// Étape 1 — crée un upload set. Le serveur se chargera du découpage en
     /// séquences et de la déduplication.
+    /// - Note: la requête est envoyée telle quelle. Une version antérieure
+    ///   remplissait `user_agent` en douce lorsqu'il était nil : la commodité ne
+    ///   valait pas le prix payé, un diagnostic qui affichait un corps différent
+    ///   de celui réellement envoyé, et six tentatives de bisection fausses.
+    ///   Ce que l'appelant écrit est ce qui part.
     public func createUploadSet(_ body: UploadSetRequest) async throws -> UploadSet {
-        var body = body
-        if body.userAgent == nil { body.userAgent = userAgent }
         let request = makeRequest(
             "POST",
             path: "upload_sets",
@@ -27,18 +30,23 @@ extension PanoramaxClient {
     /// la file d'envoi de l'application.
     ///
     /// - Parameter bodyFileURL: fichier produit par ``MultipartBodyBuilder``.
+    /// - Returns: la réponse du serveur, telle quelle. Un envoi accepté ne dit
+    ///   pas encore ce que le serveur a compris du fichier : c'est cette
+    ///   réponse qui le dit.
+    @discardableResult
     public func uploadPreparedFile(
         uploadSetID: UUID,
         bodyFileURL: URL,
         contentType: String
-    ) async throws {
+    ) async throws -> String {
         var request = makeRequest(
             "POST",
             path: "upload_sets/\(uploadSetID.uuidString)/files",
             contentType: contentType
         )
         request.httpBody = try Data(contentsOf: bodyFileURL)
-        try await send(request)
+        let data = try await send(request)
+        return String(data: data, encoding: .utf8) ?? "<\(data.count) octets>"
     }
 
     /// Construit la requête d'envoi sans l'exécuter, pour la confier à une
@@ -93,6 +101,38 @@ extension PanoramaxClient {
             makeRequest("GET", path: "upload_sets/\(id.uuidString)"),
             as: UploadSet.self
         )
+    }
+
+    /// Ancienne API d'envoi : crée directement une séquence.
+    ///
+    /// Conservée comme voie de repli et comme sonde. Les upload sets restent le
+    /// chemin nominal (voir `docs/adr/0001`), mais toutes les instances ne les
+    /// servent pas forcément : savoir laquelle des deux routes répond est la
+    /// première question à poser quand un envoi échoue.
+    public func createCollection(title: String) async throws -> PanoramaxCollection {
+        try await send(
+            makeRequest(
+                "POST",
+                path: "collections",
+                body: try encode(["title": title]),
+                contentType: "application/json"
+            ),
+            as: PanoramaxCollection.self
+        )
+    }
+
+    /// Supprime un upload set et ce qu'il contient.
+    public func deleteUploadSet(id: UUID) async throws {
+        try await send(makeRequest("DELETE", path: "upload_sets/\(id.uuidString)"))
+    }
+
+    /// Supprime une séquence et les photos qu'elle contient.
+    ///
+    /// Indispensable à tout essai contre une instance publique : ce qu'on y
+    /// dépose devient de la donnée réelle dans un commun partagé. Un essai se
+    /// nettoie derrière lui.
+    public func deleteCollection(id: UUID) async throws {
+        try await send(makeRequest("DELETE", path: "collections/\(id.uuidString)"))
     }
 
     /// Étape 4 bis — détail par fichier, avec les motifs de refus.

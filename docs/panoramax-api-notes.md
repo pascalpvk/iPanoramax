@@ -39,6 +39,15 @@ L'intérêt décisif : **aucune inscription préalable de l'application** n'est
 nécessaire auprès de chaque instance. Le même code fonctionne sur la vingtaine
 d'instances publiques.
 
+> **Vérifié sur le terrain, 13 septembre 2026.** Un jeton généré mais pas
+> encore revendiqué fait répondre `GET /api/users/me` en **403**, pas en 401,
+> sur `panoramax.openstreetmap.fr`. C'est cohérent — le jeton est signé et
+> valide, il lui manque seulement un compte rattaché, donc « droits
+> insuffisants » plutôt que « authentification requise » — mais la
+> documentation ne le dit pas. Une boucle d'attente qui ne réessaie que sur 401
+> prend donc l'attente normale pour un refus définitif.
+> Voir `PanoramaxError.meansTokenNotYetClaimed`.
+
 Stockage du JWT : Keychain, avec `kSecAttrAccessibleAfterFirstUnlock` — il doit
 rester lisible par la session d'envoi en tâche de fond, qui peut s'exécuter
 appareil verrouillé.
@@ -72,6 +81,24 @@ POST /api/upload_sets            Content-Type: application/json
 | `user_agent` | chaîne | — |
 
 Réponse : `201`, en-tête `Location`, et l'UUID dans le corps.
+
+> **Vérifié sur le terrain, 20 septembre 2026 — bug serveur.**
+> Envoyer le champ `user_agent` à `POST /api/upload_sets` fait rendre un **500**
+> par l'instance `panoramax.openstreetmap.fr` (API 2.15.1-22-gf754cc9). Le champ
+> figure pourtant dans la spécification OpenAPI de la route. La même requête
+> sans lui est acceptée.
+>
+> Valeur testée : `panoramax-probe (iPanoramax)` — parenthèses et espaces. On ne
+> sait pas encore si c'est le champ ou sa valeur ; l'échelon « user_agent
+> simple » de `panoramax-probe upload` le dira.
+>
+> **iPanoramax n'envoie donc pas `user_agent`** jusqu'à ce que ce soit tranché.
+> À signaler à l'équipe Panoramax : un 500 sur un champ documenté est un bug
+> serveur, pas une particularité à contourner en silence.
+>
+> Plus généralement, la page d'erreur d'un 500 ne distingue pas « corps refusé »
+> de « serveur en panne ». Réduire le corps champ à champ est le seul moyen de
+> savoir, et `panoramax-probe upload` le fait automatiquement.
 
 ### 2. Verser les fichiers
 

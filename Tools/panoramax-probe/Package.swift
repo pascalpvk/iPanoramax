@@ -12,13 +12,15 @@ let package = Package(
         .executable(name: "panoramax-probe", targets: ["PanoramaxProbe"])
     ],
     dependencies: [
-        .package(path: "../../Packages/PanoramaxKit")
+        .package(path: "../../Packages/PanoramaxKit"),
+        .package(path: "../../Packages/ImageMetadataKit")
     ],
     targets: [
         .executableTarget(
             name: "PanoramaxProbe",
             dependencies: [
-                .product(name: "PanoramaxKit", package: "PanoramaxKit")
+                .product(name: "PanoramaxKit", package: "PanoramaxKit"),
+                .product(name: "ImageMetadataKit", package: "ImageMetadataKit")
             ],
             swiftSettings: [.swiftLanguageMode(.v6)]
         )

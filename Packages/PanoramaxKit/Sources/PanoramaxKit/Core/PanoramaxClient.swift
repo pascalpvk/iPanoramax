@@ -12,6 +12,13 @@ import Foundation
 /// let config = try await client.configuration()
 /// print(config.license?.id ?? "licence non déclarée")
 /// ```
+/// Réponse HTTP non interprétée, rendue par ``PanoramaxClient/raw(_:path:authenticated:)``.
+public struct PanoramaxRawResponse: Sendable {
+    public let statusCode: Int
+    public let headers: [String: String]
+    public let body: String
+}
+
 public actor PanoramaxClient {
 
     public let instance: PanoramaxInstance
@@ -116,6 +123,50 @@ public actor PanoramaxClient {
         } catch {
             throw PanoramaxError.decoding("Encodage impossible : \(error)")
         }
+    }
+
+    // MARK: - Diagnostic
+
+    /// Exécute une requête et rend la réponse telle quelle, sans interpréter le
+    /// code de statut.
+    ///
+    /// Réservé au diagnostic : tout le reste passe par les méthodes typées. Sert
+    /// à comprendre un refus quand le code de statut seul ne suffit pas.
+    public func raw(
+        _ method: String = "GET",
+        path: String,
+        body: Data? = nil,
+        contentType: String? = nil,
+        authenticated: Bool = true
+    ) async throws -> PanoramaxRawResponse {
+        let request = makeRequest(
+            method,
+            path: path,
+            body: body,
+            contentType: contentType,
+            authenticated: authenticated
+        )
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            throw PanoramaxError.transport(error.localizedDescription)
+        }
+        guard let http = response as? HTTPURLResponse else {
+            throw PanoramaxError.transport("Réponse non HTTP")
+        }
+        var headers: [String: String] = [:]
+        for (key, value) in http.allHeaderFields {
+            if let key = key as? String, let value = value as? String {
+                headers[key] = value
+            }
+        }
+        return PanoramaxRawResponse(
+            statusCode: http.statusCode,
+            headers: headers,
+            body: String(data: data, encoding: .utf8) ?? "<\(data.count) octets binaires>"
+        )
     }
 
     // MARK: - Utilitaires

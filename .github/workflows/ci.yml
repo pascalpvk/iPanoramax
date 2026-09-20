@@ -10,9 +10,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  package:
-    name: PanoramaxKit — build & tests
+  packages:
+    name: ${{ matrix.package }}
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [PanoramaxKit, ImageMetadataKit]
     steps:
       - uses: actions/checkout@v4
 
@@ -20,14 +24,19 @@ jobs:
         run: swift --version
 
       - name: Build
-        working-directory: Packages/PanoramaxKit
+        working-directory: Packages/${{ matrix.package }}
         run: swift build -v
 
       - name: Tests
-        working-directory: Packages/PanoramaxKit
+        working-directory: Packages/${{ matrix.package }}
         run: swift test -v
 
-      - name: Build de panoramax-probe
+  probe:
+    name: panoramax-probe
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
         working-directory: Tools/panoramax-probe
         run: swift build -v
 

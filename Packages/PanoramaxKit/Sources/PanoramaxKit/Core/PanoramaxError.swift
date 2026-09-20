@@ -38,6 +38,19 @@ public enum PanoramaxError: Error, Sendable, Equatable {
     /// Échec de transport (réseau coupé, TLS, délai dépassé).
     case transport(String)
 
+    /// `true` quand la réponse est compatible avec « jeton valide, mais encore
+    /// rattaché à aucun compte ».
+    ///
+    /// La documentation laisse entendre 401. En pratique l'instance OSM-FR
+    /// répond **403** : le jeton est bien signé, il lui manque seulement un
+    /// compte. Les deux codes doivent donc suspendre l'attente, pas l'arrêter.
+    public var meansTokenNotYetClaimed: Bool {
+        switch self {
+        case .unauthorized, .forbidden: true
+        default: false
+        }
+    }
+
     /// `true` si un nouvel essai a une chance d'aboutir.
     /// Pilote directement la politique de reprise de la file d'envoi.
     public var isRetryable: Bool {

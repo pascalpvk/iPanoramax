@@ -76,15 +76,22 @@ extension PanoramaxClient {
     /// - Parameters:
     ///   - interval: intervalle entre deux essais.
     ///   - timeout: délai au-delà duquel on abandonne.
+    /// - Parameter onAttempt: appelé à chaque essai infructueux, avec le numéro
+    ///   d'essai et l'erreur rencontrée. Sert à ne pas laisser l'utilisateur
+    ///   devant un écran muet pendant cinq minutes.
     public func waitForTokenClaim(
         every interval: Duration = .seconds(2),
-        timeout: Duration = .seconds(300)
+        timeout: Duration = .seconds(300),
+        onAttempt: (@Sendable (Int, PanoramaxError) -> Void)? = nil
     ) async throws -> PanoramaxUser {
         let deadline = ContinuousClock.now.advanced(by: timeout)
+        var attempt = 0
         while ContinuousClock.now < deadline {
+            attempt += 1
             do {
                 return try await currentUser()
-            } catch PanoramaxError.unauthorized {
+            } catch let error as PanoramaxError where error.meansTokenNotYetClaimed {
+                onAttempt?(attempt, error)
                 try await Task.sleep(for: interval)
             }
         }

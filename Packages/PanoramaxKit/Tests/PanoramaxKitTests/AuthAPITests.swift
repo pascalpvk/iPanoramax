@@ -78,6 +78,30 @@ struct AuthAPITests {
         #expect(network.requests.count == 3)
     }
 
+    @Test("Un 403 vaut aussi « pas encore revendiqué » — c'est ce que rend OSM-FR")
+    func treatsForbiddenAsUnclaimed() async throws {
+        let network = MockNetwork()
+        network.stub(sequence: [
+            .status(403),
+            .status(403),
+            .json(Self.userJSON)
+        ])
+        let client = network.makeClient(token: "header.payload.signature")
+
+        let seen = ErrorLog()
+        let user = try await client.waitForTokenClaim(
+            every: .milliseconds(5),
+            timeout: .seconds(5),
+            onAttempt: { _, error in seen.append(error) }
+        )
+
+        #expect(user.name == "pascalpvk")
+        #expect(seen.all == [.forbidden, .forbidden])
+        #expect(PanoramaxError.forbidden.meansTokenNotYetClaimed)
+        #expect(PanoramaxError.unauthorized.meansTokenNotYetClaimed)
+        #expect(!PanoramaxError.notFound.meansTokenNotYetClaimed)
+    }
+
     @Test("Un jeton jamais revendiqué finit en tokenNotClaimed")
     func givesUpOnUnclaimedToken() async {
         let network = MockNetwork()

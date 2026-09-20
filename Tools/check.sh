@@ -9,41 +9,64 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 LOG="$PWD/check.log"
 
+PACKAGES=(Packages/PanoramaxKit Packages/ImageMetadataKit)
+TOOLS=(Tools/panoramax-probe)
+
+# Le verdict doit nommer l'étape fautive. Sans cela, une section vide juste
+# avant « RESULTAT: ECHEC » se lit comme la coupable — c'est arrivé.
+failures=()
+
+step() {
+  local label="$1"
+  shift
+  echo
+  echo "### $label"
+  if ! ( "$@" ); then
+    failures+=("$label")
+  fi
+}
+
+swift_in() {
+  local directory="$1"
+  shift
+  cd "$directory" && swift "$@"
+}
+
 {
   echo "=== iPanoramax — vérification locale ==="
   date '+%Y-%m-%d %H:%M:%S'
-  status=0
 
-  echo
-  echo "### swift --version"
-  swift --version || status=1
+  step "swift --version" swift --version
 
-  echo
-  echo "### PanoramaxKit — build"
-  (cd Packages/PanoramaxKit && swift build) || status=1
+  for package in "${PACKAGES[@]}"; do
+    name="$(basename "$package")"
+    step "$name — build" swift_in "$package" build
+    step "$name — tests" swift_in "$package" test
+  done
 
-  echo
-  echo "### PanoramaxKit — tests"
-  (cd Packages/PanoramaxKit && swift test) || status=1
-
-  echo
-  echo "### panoramax-probe — build"
-  (cd Tools/panoramax-probe && swift build) || status=1
+  for tool in "${TOOLS[@]}"; do
+    step "$(basename "$tool") — build" swift_in "$tool" build
+  done
 
   echo
   echo "### SwiftLint"
   if command -v swiftlint >/dev/null 2>&1; then
     # --strict comme en CI : un avertissement y est bloquant.
-    swiftlint lint --strict --quiet || status=1
+    if ! swiftlint lint --strict; then
+      failures+=("SwiftLint")
+    fi
   else
     echo "(swiftlint absent — brew install swiftlint)"
   fi
 
   echo
-  if [ "$status" -eq 0 ]; then
+  if [ "${#failures[@]}" -eq 0 ]; then
     echo "RESULTAT: OK"
   else
     echo "RESULTAT: ECHEC"
+    for failed in "${failures[@]}"; do
+      echo "  ✗ $failed"
+    done
   fi
 } 2>&1 | tee "$LOG"
 

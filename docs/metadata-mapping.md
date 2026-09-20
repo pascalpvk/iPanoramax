@@ -17,6 +17,7 @@ test dans `ImageMetadataKitTests`.
 | Date UTC | `GPSDateStamp` (`AAAA:MM:JJ`) | chaîne | `CLLocation.timestamp` | canal le plus fiable, car sans ambiguïté de fuseau |
 | Heure UTC | `GPSTimeStamp` | 3 rationnels h/m/s | `CLLocation.timestamp` | |
 | Date locale | `DateTimeOriginal` (`AAAA:MM:JJ HH:MM:SS`) | chaîne | horloge de l'appareil | écrit en complément, jamais seul |
+| Décalage | `OffsetTimeOriginal` (`+HH:MM`) | chaîne | `TimeZone.secondsFromGMT` | réponse d'EXIF 2.31 à l'ambiguïté ci-dessous |
 
 > **Piège classique.** `DateTimeOriginal` est en heure locale *sans* fuseau.
 > Écrire uniquement ce tag rend l'horodatage ambigu, et Panoramax privilégie
@@ -66,6 +67,16 @@ JPEG (`XMPInjector`).
 | Tangage | `Xmp.Camera.Pitch` | `CMAttitude.pitch` |
 | Roulis | `Xmp.Camera.Roll` | `CMAttitude.roll` |
 | Projection 360° | `Xmp.GPano.ProjectionType = equirectangular` | hors périmètre v1 |
+
+Le préfixe `Camera` correspond à l'espace de noms **`http://pix4d.com/camera/1.0/`**
+— celui qu'exiv2, et donc Panoramax, associe à `Xmp.Camera.*`. Une autre URI
+produirait un paquet syntaxiquement valide mais silencieusement ignoré à
+l'ingestion.
+
+Le segment APP1 se place **après** les segments applicatifs de tête : l'APP1
+Exif doit rester le premier après SOI, faute de quoi beaucoup de lecteurs
+perdent l'EXIF. Et l'ordre d'écriture compte — ImageIO ne préserve pas les
+segments applicatifs qu'il ne connaît pas, donc EXIF d'abord, XMP ensuite.
 
 ## Tags Mapillary
 
