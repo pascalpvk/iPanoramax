@@ -46,6 +46,7 @@ swift run panoramax-probe upload ~/photos/photo.jpg --send \
 | `--lat` `--lon` `--alt` | position à inscrire (défaut : Tour Eiffel) |
 | `--heading` | cap de visée en degrés |
 | `--title` | titre de l'upload set |
+| `--token` | utiliser ce jeton plutôt que celui mémorisé |
 
 > **Un envoi crée de la donnée réelle sur un commun partagé.** L'outil lit
 > d'abord `/api/configuration` : si l'instance déclare `owner-only`, l'essai
@@ -57,6 +58,14 @@ swift run panoramax-probe upload ~/photos/photo.jpg --send \
 Quand la création d'un upload set échoue, l'outil réessaie en retirant les
 champs un à un et indique lequel débloque la situation : une erreur 500 rend
 une page générique qui ne nomme pas le champ fautif.
+
+Le traitement serveur — floutage compris — peut durer plusieurs minutes sur une
+instance chargée. Inutile de renvoyer la photo pour savoir où il en est :
+
+```bash
+swift run panoramax-probe status e6f2fce2-47f5-40b5-aa96-c16ccdefe9b1
+swift run panoramax-probe status e6f2fce2-47f5-40b5-aa96-c16ccdefe9b1 --delete
+```
 
 ## Stockage du jeton
 

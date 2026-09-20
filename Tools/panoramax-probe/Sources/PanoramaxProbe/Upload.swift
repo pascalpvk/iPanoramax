@@ -130,6 +130,43 @@ enum UploadProbe {
         await cleanUp(client, uploadSet: final, host: host)
     }
 
+    // MARK: - Suivi différé
+
+    /// Où en est un envoi déjà fait.
+    ///
+    /// Un traitement peut durer plusieurs minutes sur une instance chargée :
+    /// il faut pouvoir revenir sans renvoyer la photo.
+    static func status(
+        instance: PanoramaxInstance,
+        host: String,
+        arguments: Arguments
+    ) async throws {
+        guard let raw = arguments.argument(at: 1), let id = UUID(uuidString: raw) else {
+            Probe.fail("Indique l'identifiant de l'upload set : panoramax-probe status <uuid>")
+        }
+        guard let entry = TokenStore().entry(for: host) else {
+            Probe.fail("Aucun jeton pour \(host). Lance d'abord : panoramax-probe login \(host)")
+        }
+        let client = PanoramaxClient(instance: instance, token: entry.jwt, userAgent: Probe.userAgent)
+
+        let uploadSet = try await client.uploadSet(id: id)
+        print("Upload set \(id.uuidString)")
+        print("  titre       \(uploadSet.title ?? "—")")
+        print("  reçues      \(uploadSet.nbItems ?? 0) / \(uploadSet.estimatedNbFiles ?? 0)")
+        print("  clos        \(uploadSet.completed == true ? "oui" : "non")")
+        print("  réparti     \(uploadSet.dispatched == true ? "oui" : "non")")
+        print("  prêt        \(uploadSet.ready == true ? "oui" : "non")")
+        print("  état        \(uploadSet.itemsStatus?.description ?? "inconnu")")
+
+        try await report(client, uploadSet: uploadSet, host: host)
+
+        if arguments.has("delete") {
+            await cleanUp(client, uploadSet: uploadSet, host: host)
+        } else if uploadSet.ready != true {
+            print("\nAjoute --delete pour supprimer cet essai.")
+        }
+    }
+
     // MARK: - Visibilité
 
     /// Un essai ne doit pas devenir de la donnée publique. Si l'instance ne
@@ -394,14 +431,20 @@ enum UploadProbe {
         for _ in 1...attempts {
             if latest.ready == true { return latest }
             let status = latest.itemsStatus
-            print("  traitement… prêt \(status?.prepared ?? 0)"
-                + ", en cours \(status?.preparing ?? 0)"
-                + ", cassé \(status?.broken ?? 0)"
-                + ", refusé \(status?.rejected ?? 0)")
+            print("  \(latest.nbItems ?? 0) reçue(s) — \(status?.description ?? "état inconnu")")
             try await Task.sleep(for: .seconds(3))
             latest = try await client.uploadSet(id: id)
         }
-        print("  Toujours pas prêt après \(attempts) essais — voir le JSON ci-dessus.")
+        if latest.itemsStatus?.isWaiting == true {
+            print("""
+                  Toujours en file d'attente après \(attempts) essais. Ce n'est pas un
+                  échec : l'instance floute les visages et les plaques, et la file est
+                  partagée. Reviens plus tard avec :
+                    swift run panoramax-probe status \(id.uuidString)
+                  """)
+        } else {
+            print("  Toujours pas prêt après \(attempts) essais — voir le JSON ci-dessus.")
+        }
         return latest
     }
 
@@ -421,6 +464,10 @@ enum UploadProbe {
             }
         }
 
+        if let status = uploadSet.itemsStatus, status.isWaiting {
+            print("\nTraitement en file d'attente côté serveur — \(status.description).")
+        }
+
         for collection in uploadSet.associatedCollections ?? [] {
             print("\nSéquence \(collection.id.uuidString)")
             print("  \(collection.nbItems ?? 0) photo(s), prête : \(collection.ready == true ? "oui" : "pas encore")")
@@ -433,12 +480,21 @@ enum UploadProbe {
     /// Un essai contre une instance publique se nettoie derrière lui : ce qu'on
     /// y dépose est de la donnée réelle dans un commun partagé.
     static func cleanUp(_ client: PanoramaxClient, uploadSet: UploadSet, host: String) async {
+        print("\n--- Nettoyage ---")
         let collections = uploadSet.associatedCollections ?? []
         guard !collections.isEmpty else {
-            print("\nAucune séquence créée — rien à nettoyer.")
+            // Pas encore de séquence : c'est l'ensemble lui-même qu'il faut
+            // retirer, sinon l'essai reste visible dans l'interface web sous la
+            // mention « envoi non terminé ».
+            do {
+                try await client.deleteUploadSet(id: uploadSet.id)
+                print("Upload set \(uploadSet.id.uuidString) supprimé (aucune séquence créée).")
+            } catch {
+                print("Suppression impossible : \(Probe.describe(error))")
+                print("À retirer depuis https://\(host)/ — bouton « Supprimer toutes les photos ».")
+            }
             return
         }
-        print("\n--- Nettoyage ---")
         for collection in collections {
             do {
                 try await client.deleteCollection(id: collection.id)

@@ -78,10 +78,19 @@ public struct UploadSetRequest: Codable, Sendable {
 }
 
 public struct ItemsStatus: Codable, Sendable, Hashable {
+    /// Traitée et prête.
     public let prepared: Int?
+    /// En cours de traitement.
     public let preparing: Int?
+    /// Traitement échoué.
     public let broken: Int?
+    /// Refusée à l'ingestion.
     public let rejected: Int?
+    /// **Reçue, en file d'attente.** Ce n'est pas un échec : sur une instance
+    /// qui floute les visages et les plaques, une photo peut y séjourner
+    /// plusieurs minutes. C'est aussi le compteur le plus souvent non nul juste
+    /// après un envoi — l'oublier à l'affichage donne l'illusion que rien n'est
+    /// arrivé.
     public let notProcessed: Int?
 
     enum CodingKeys: String, CodingKey {
@@ -91,6 +100,19 @@ public struct ItemsStatus: Codable, Sendable, Hashable {
 
     public var total: Int {
         [prepared, preparing, broken, rejected, notProcessed].compactMap { $0 }.reduce(0, +)
+    }
+
+    /// Reçues mais pas encore traitées : rien à faire sinon attendre.
+    public var isWaiting: Bool {
+        (notProcessed ?? 0) > 0 || (preparing ?? 0) > 0
+    }
+
+    public var description: String {
+        "prête \(prepared ?? 0)"
+            + ", en cours \(preparing ?? 0)"
+            + ", en attente \(notProcessed ?? 0)"
+            + ", cassée \(broken ?? 0)"
+            + ", refusée \(rejected ?? 0)"
     }
 }
 
@@ -111,15 +133,26 @@ public struct UploadSet: Codable, Sendable {
     public let id: UUID
     public let title: String?
     public let createdAt: Date?
+    /// Tous les fichiers annoncés ont été versés, ou `/complete` a été appelé.
     public let completed: Bool?
+    /// Les photos ont été réparties en séquences.
     public let dispatched: Bool?
+    /// Traitement terminé de bout en bout.
     public let ready: Bool?
+    /// Nombre de fichiers effectivement reçus par le serveur.
+    public let nbItems: Int?
+    public let estimatedNbFiles: Int?
+    public let accountId: UUID?
+    public let visibility: String?
     public let itemsStatus: ItemsStatus?
     public let associatedCollections: [AssociatedCollection]?
 
     enum CodingKeys: String, CodingKey {
-        case id, title, completed, dispatched, ready
+        case id, title, completed, dispatched, ready, visibility
         case createdAt = "created_at"
+        case nbItems = "nb_items"
+        case estimatedNbFiles = "estimated_nb_files"
+        case accountId = "account_id"
         case itemsStatus = "items_status"
         case associatedCollections = "associated_collections"
     }
@@ -136,13 +169,22 @@ public struct UploadSetFile: Codable, Sendable, Hashable {
     public let pictureId: UUID?
     public let fileName: String?
     public let size: Int?
+    public let contentMd5: String?
+    public let insertedAt: Date?
+    public let fileType: String?
     public let rejected: FileRejection?
 
     enum CodingKeys: String, CodingKey {
         case size, rejected
         case pictureId = "picture_id"
         case fileName = "file_name"
+        case contentMd5 = "content_md5"
+        case insertedAt = "inserted_at"
+        case fileType = "file_type"
     }
+
+    /// Un fichier sans motif de refus a été accepté.
+    public var isAccepted: Bool { rejected == nil }
 }
 
 struct UploadSetFilesResponse: Codable, Sendable {

@@ -30,6 +30,6 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) · versionnage
 - Le champ `user_agent` de `POST /api/upload_sets` fait rendre un 500 par
   l'instance OSM-FR alors qu'il figure dans sa spécification. Non envoyé pour
   l'instant ; à signaler au projet Panoramax.
-- `items_status` et `ready` restent à zéro ou absents dans notre modèle alors
-  que la photo est acceptée : le modèle a été bâti sur le résumé OpenAPI, pas
-  sur une réponse réelle. À corriger sur la foi du JSON brut.
+- Le traitement d'une photo (floutage compris) peut rester plusieurs minutes en
+  file d'attente sur une instance chargée. Ce n'est pas un échec : voir
+  `panoramax-probe status`.

@@ -84,6 +84,35 @@ struct UploadSetsAPITests {
         #expect(uploadSet.associatedCollections?.first?.nbItems == 12)
     }
 
+    @Test("Décode la réponse réelle d'OSM-FR juste après un envoi")
+    func decodesRealWorldResponse() throws {
+        guard let url = Bundle.module.url(
+            forResource: "upload-set-osmfr",
+            withExtension: "json",
+            subdirectory: "Fixtures"
+        ) else {
+            Issue.record("Fixture upload-set-osmfr.json introuvable")
+            return
+        }
+        let uploadSet = try PanoramaxClient.makeDecoder()
+            .decode(UploadSet.self, from: try Data(contentsOf: url))
+
+        #expect(uploadSet.completed == true)
+        #expect(uploadSet.dispatched == false)
+        #expect(uploadSet.ready == false)
+        #expect(uploadSet.nbItems == 1)
+        #expect(uploadSet.visibility == "owner-only")
+        #expect(uploadSet.associatedCollections?.isEmpty == true)
+
+        // Le fichier est reçu et en file d'attente : le seul compteur non nul
+        // est `not_processed`. L'omettre à l'affichage laisse croire que rien
+        // n'est arrivé — c'est exactement ce qui s'est produit.
+        let status = try #require(uploadSet.itemsStatus)
+        #expect(status.notProcessed == 1)
+        #expect(status.total == 1)
+        #expect(status.isWaiting)
+    }
+
     @Test("Le motif de refus d'un fichier est conservé")
     func decodesRejection() async throws {
         let network = MockNetwork()

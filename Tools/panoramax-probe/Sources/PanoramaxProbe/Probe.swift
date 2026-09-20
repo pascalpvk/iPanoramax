@@ -17,7 +17,8 @@ struct Probe {
         }
 
         // `upload` prend le fichier en premier positionnel, l'instance ensuite.
-        let hostIndex = command == "upload" ? 2 : 1
+        // `upload` et `status` prennent un argument avant l'instance.
+        let hostIndex = ["upload", "status"].contains(command) ? 2 : 1
         let host = arguments.argument(at: hostIndex) ?? defaultHost
 
         guard let instance = PanoramaxInstance(websiteURL: host) else {
@@ -33,6 +34,8 @@ struct Probe {
             case "diagnose": try await diagnose(instance, host: host)
             case "upload":
                 try await UploadProbe.run(instance: instance, host: host, arguments: arguments)
+            case "status":
+                try await UploadProbe.status(instance: instance, host: host, arguments: arguments)
             case "-h", "--help", "help": printUsage()
             default:
                 printUsage()
@@ -196,6 +199,7 @@ struct Probe {
           panoramax-probe logout   [instance]   révoque et oublie le jeton
           panoramax-probe diagnose [instance]   réponses brutes, pour comprendre un refus
           panoramax-probe upload <photo.jpg> [instance] [options]
+          panoramax-probe status <upload-set-id> [instance]
 
         Options d'upload :
           --send              envoyer réellement (sans lui, essai à blanc)
