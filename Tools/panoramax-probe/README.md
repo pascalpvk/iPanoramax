@@ -1,30 +1,59 @@
 # panoramax-probe
 
-Outil en ligne de commande pour éprouver `PanoramaxKit` contre une vraie
-instance Panoramax, sans passer par Xcode ni le simulateur.
-
-Il sert à dérisquer l'authentification — la brique dont dépend tout le reste —
-et à vérifier que le client décode bien ce que renvoient les instances réelles.
+Outil en ligne de commande pour éprouver `PanoramaxKit` et `ImageMetadataKit`
+contre une vraie instance Panoramax, sans passer par Xcode ni le simulateur.
 
 ```bash
 cd Tools/panoramax-probe
 
-# Lire la configuration publique d'une instance (aucun compte nécessaire)
+# Configuration publique d'une instance (aucun compte nécessaire)
 swift run panoramax-probe config panoramax.openstreetmap.fr
 
 # Flux complet : generate → claim dans le navigateur → /users/me
 swift run panoramax-probe login panoramax.openstreetmap.fr
 
 # Vérifier le jeton mémorisé
-swift run panoramax-probe whoami panoramax.openstreetmap.fr
+swift run panoramax-probe whoami
+
+# Réponses brutes, quand un code de statut ne suffit pas à comprendre un refus
+swift run panoramax-probe diagnose
 
 # Révoquer le jeton côté serveur et l'oublier localement
-swift run panoramax-probe logout panoramax.openstreetmap.fr
+swift run panoramax-probe logout
 ```
 
-L'instance par défaut est `panoramax.openstreetmap.fr`.
+## L'épreuve du feu
 
-> **Le jeton est stocké en clair** dans `~/.config/ipanoramax/tokens.json`.
-> C'est acceptable pour un outil de mise au point sur ta propre machine ; dans
-> l'application, le jeton va au Keychain. Ne versionne jamais ce fichier et
-> révoque le jeton avec `logout` quand tu as fini.
+`upload` écrit nos métadonnées dans un JPEG, relit le fichier produit, puis —
+sur demande — l'envoie et rapporte le verdict du serveur. C'est le seul test qui
+prouve que la chaîne complète fonctionne : aucune fixture ne peut dire si
+Panoramax accepte un fichier.
+
+```bash
+# Essai à blanc : écrit photo.panoramax.jpg et affiche ce qu'il contient
+swift run panoramax-probe upload ~/photos/photo.jpg
+
+# Envoi réel, puis suppression de la séquence
+swift run panoramax-probe upload ~/photos/photo.jpg --send \
+    --lat 45.9237 --lon 6.8694 --heading 137
+```
+
+| Option | Effet |
+|---|---|
+| `--send` | envoie réellement ; sans lui, tout reste local |
+| `--keep` | conserve la séquence au lieu de la supprimer |
+| `--lat` `--lon` `--alt` | position à inscrire (défaut : Tour Eiffel) |
+| `--heading` | cap de visée en degrés |
+| `--title` | titre de l'upload set |
+
+> **Un envoi crée de la donnée réelle sur un commun partagé.** L'essai part donc
+> en visibilité `owner-only`, et la séquence est supprimée à la fin sauf
+> `--keep`. Si la suppression échoue, l'outil le dit et donne l'identifiant à
+> retirer à la main.
+
+## Stockage du jeton
+
+> Le jeton est enregistré **en clair** dans `~/.config/ipanoramax/tokens.json`.
+> Acceptable pour un outil de mise au point sur ta propre machine ; dans
+> l'application, il va au Keychain. Ne versionne jamais ce fichier, et révoque
+> le jeton avec `logout` quand tu as fini.

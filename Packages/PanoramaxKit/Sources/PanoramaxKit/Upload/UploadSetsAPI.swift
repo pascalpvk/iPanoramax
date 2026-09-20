@@ -95,6 +95,15 @@ extension PanoramaxClient {
         )
     }
 
+    /// Supprime une séquence et les photos qu'elle contient.
+    ///
+    /// Indispensable à tout essai contre une instance publique : ce qu'on y
+    /// dépose devient de la donnée réelle dans un commun partagé. Un essai se
+    /// nettoie derrière lui.
+    public func deleteCollection(id: UUID) async throws {
+        try await send(makeRequest("DELETE", path: "collections/\(id.uuidString)"))
+    }
+
     /// Étape 4 bis — détail par fichier, avec les motifs de refus.
     public func uploadSetFiles(id: UUID) async throws -> [UploadSetFile] {
         let response = try await send(

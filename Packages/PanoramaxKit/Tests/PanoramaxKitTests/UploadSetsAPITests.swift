@@ -115,6 +115,21 @@ struct UploadSetsAPITests {
         #expect(files[1].rejected?.message == "Position GPS absente")
     }
 
+    @Test("La suppression d'une séquence vise DELETE /collections/{id}")
+    func deletesCollection() async throws {
+        let network = MockNetwork()
+        network.stub { _ in .status(204) }
+        let client = network.makeClient(token: "header.payload.signature")
+        let id = try #require(UUID(uuidString: "8c1f0b02-0000-4000-8000-000000000001"))
+
+        try await client.deleteCollection(id: id)
+
+        let sent = try #require(network.requests.first)
+        #expect(sent.httpMethod == "DELETE")
+        #expect(sent.url?.path == "/api/collections/\(id.uuidString)")
+        #expect(sent.value(forHTTPHeaderField: "Authorization") == "Bearer header.payload.signature")
+    }
+
     @Test("La clôture vise bien /complete")
     func callsCompleteEndpoint() async throws {
         let network = MockNetwork()

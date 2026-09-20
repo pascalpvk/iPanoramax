@@ -10,12 +10,15 @@ struct Probe {
     static let userAgent = "panoramax-probe (iPanoramax)"
 
     static func main() async {
-        let arguments = Array(CommandLine.arguments.dropFirst())
-        guard let command = arguments.first else {
+        let arguments = Arguments(Array(CommandLine.arguments.dropFirst()))
+        guard let command = arguments.argument(at: 0) else {
             printUsage()
             exit(2)
         }
-        let host = arguments.count > 1 ? arguments[1] : defaultHost
+
+        // `upload` prend le fichier en premier positionnel, l'instance ensuite.
+        let hostIndex = command == "upload" ? 2 : 1
+        let host = arguments.argument(at: hostIndex) ?? defaultHost
 
         guard let instance = PanoramaxInstance(websiteURL: host) else {
             fail("Instance illisible : \(host)")
@@ -28,6 +31,8 @@ struct Probe {
             case "whoami":   try await whoami(instance, host: host)
             case "logout":   try await logout(instance, host: host)
             case "diagnose": try await diagnose(instance, host: host)
+            case "upload":
+                try await UploadProbe.run(instance: instance, host: host, arguments: arguments)
             case "-h", "--help", "help": printUsage()
             default:
                 printUsage()
@@ -190,6 +195,18 @@ struct Probe {
           panoramax-probe whoami   [instance]   vérifie le jeton mémorisé
           panoramax-probe logout   [instance]   révoque et oublie le jeton
           panoramax-probe diagnose [instance]   réponses brutes, pour comprendre un refus
+          panoramax-probe upload <photo.jpg> [instance] [options]
+
+        Options d'upload :
+          --send              envoyer réellement (sans lui, essai à blanc)
+          --keep              ne pas supprimer la séquence après l'essai
+          --lat --lon --alt   position à inscrire  (défaut : Tour Eiffel)
+          --heading           cap de visée en degrés
+          --title             titre de l'upload set
+
+        Un essai envoyé l'est en visibilité owner-only, et la séquence est
+        supprimée ensuite : ce qu'on dépose sur une instance publique est de la
+        donnée réelle dans un commun partagé.
 
         Instance par défaut : \(defaultHost)
         """)
