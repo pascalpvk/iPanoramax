@@ -82,6 +82,15 @@ POST /api/upload_sets            Content-Type: application/json
 
 Réponse : `201`, en-tête `Location`, et l'UUID dans le corps.
 
+> **Vérifié sur le terrain, 20 septembre 2026.** `POST /api/upload_sets` peut
+> rendre un **500** avec une page d'erreur générique, sans nommer le champ en
+> cause. Un corps réduit au seul `{"title": "…"}` passe. Instance testée :
+> `panoramax.openstreetmap.fr`, API 2.15.1-22-gf754cc9.
+>
+> La page d'erreur ne distingue pas « corps refusé » de « serveur en panne » :
+> en cas de 500 sur cette route, réduire le corps champ à champ est le seul
+> moyen de savoir. `panoramax-probe upload` le fait automatiquement.
+
 ### 2. Verser les fichiers
 
 ```

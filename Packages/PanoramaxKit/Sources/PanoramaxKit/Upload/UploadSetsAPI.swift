@@ -6,9 +6,12 @@ extension PanoramaxClient {
 
     /// Étape 1 — crée un upload set. Le serveur se chargera du découpage en
     /// séquences et de la déduplication.
+    /// - Note: la requête est envoyée telle quelle. Une version antérieure
+    ///   remplissait `user_agent` en douce lorsqu'il était nil : la commodité ne
+    ///   valait pas le prix payé, un diagnostic qui affichait un corps différent
+    ///   de celui réellement envoyé, et six tentatives de bisection fausses.
+    ///   Ce que l'appelant écrit est ce qui part.
     public func createUploadSet(_ body: UploadSetRequest) async throws -> UploadSet {
-        var body = body
-        if body.userAgent == nil { body.userAgent = userAgent }
         let request = makeRequest(
             "POST",
             path: "upload_sets",
@@ -111,6 +114,11 @@ extension PanoramaxClient {
             ),
             as: PanoramaxCollection.self
         )
+    }
+
+    /// Supprime un upload set et ce qu'il contient.
+    public func deleteUploadSet(id: UUID) async throws {
+        try await send(makeRequest("DELETE", path: "upload_sets/\(id.uuidString)"))
     }
 
     /// Supprime une séquence et les photos qu'elle contient.

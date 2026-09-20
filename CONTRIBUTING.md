@@ -73,6 +73,13 @@ entre elles. Un registre partagé entre suites produit des échecs déroutants, 
 un test lit les requêtes d'un autre. L'isolation doit être structurelle — voir
 `MockNetwork`, qui donne un hôte unique à chaque test.
 
+**Un client d'API ne complète pas la requête en douce.** `createUploadSet`
+remplissait `user_agent` quand l'appelant le laissait à nil. Commode — jusqu'au
+jour où un diagnostic a affiché six corps de requête qui n'étaient pas ceux
+envoyés, et où la bisection qu'ils guidaient a désigné les mauvais champs. Ce
+que l'appelant écrit est ce qui part ; les valeurs par défaut se mettent dans
+l'initialiseur du type de requête, où elles restent visibles.
+
 ## Ajouter une dépendance
 
 Elles se justifient au cas par cas. À ce jour, une seule est prévue :

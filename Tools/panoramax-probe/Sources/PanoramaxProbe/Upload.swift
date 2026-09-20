@@ -163,6 +163,9 @@ enum UploadProbe {
         title: String,
         visibility: Visibility?
     ) async throws -> UploadSet {
+        // Ordre de retrait dicté par le soupçon : `user_agent` est le seul
+        // champ présent dans les six tentatives ratées et absent du POST brut
+        // qui, lui, a été accepté.
         var attempts: [(String, UploadSetRequest)] = [
             ("complet", UploadSetRequest(
                 title: title,
@@ -170,32 +173,39 @@ enum UploadProbe {
                 sortMethod: .timeAscending,
                 visibility: visibility,
                 userAgent: Probe.userAgent
+            )),
+            ("sans user_agent", UploadSetRequest(
+                title: title,
+                estimatedNbFiles: 1,
+                sortMethod: .timeAscending,
+                visibility: visibility
             ))
         ]
+        // Un user_agent sans parenthèses ni espaces : si celui-ci passe, c'est
+        // la valeur qui gêne, pas le champ.
+        attempts.append(("user_agent simple", UploadSetRequest(
+            title: title,
+            estimatedNbFiles: 1,
+            sortMethod: .timeAscending,
+            visibility: visibility,
+            userAgent: "iPanoramax"
+        )))
         if visibility != nil {
             attempts.append(("sans visibility", UploadSetRequest(
                 title: title,
                 estimatedNbFiles: 1,
-                sortMethod: .timeAscending,
-                userAgent: Probe.userAgent
+                sortMethod: .timeAscending
             )))
         }
         attempts.append(("sans sort_method", UploadSetRequest(
             title: title,
             estimatedNbFiles: 1,
-            sortMethod: nil,
-            userAgent: Probe.userAgent
-        )))
-        attempts.append(("sans user_agent", UploadSetRequest(
-            title: title,
-            estimatedNbFiles: 1,
             sortMethod: nil
         )))
-        attempts.append(("titre seul", UploadSetRequest(title: title, sortMethod: nil)))
-        // Le titre était identique partout jusqu'ici : un accent ou un tiret
-        // cadratin mal géré côté serveur resterait invisible à une bisection
-        // qui ne fait varier que les autres champs.
-        attempts.append(("titre ASCII", UploadSetRequest(title: "iPanoramax test", sortMethod: nil)))
+        attempts.append(("titre ASCII seul", UploadSetRequest(
+            title: "iPanoramax test",
+            sortMethod: nil
+        )))
 
         var lastError: Error?
         for (index, attempt) in attempts.enumerated() {
@@ -255,15 +265,25 @@ enum UploadProbe {
             for (key, value) in response.headers.sorted(by: { $0.key < $1.key }) {
                 print("  \(key): \(value)")
             }
+            // Un essai qui réussit laisse un ensemble vide derrière lui :
+            // le nettoyage vaut aussi pour les sondes.
+            if let location = response.headers["Location"],
+               let id = location.split(separator: "/").last.flatMap({ UUID(uuidString: String($0)) }) {
+                try? await client.deleteUploadSet(id: id)
+                print("  Upload set d'essai \(id.uuidString) supprimé.")
+            }
         }
 
         print("\nEssai de l'ancienne route POST /api/collections :")
         do {
             let collection = try await client.createCollection(title: "iPanoramax test")
             print("  → acceptée, séquence \(collection.id)")
-            print("  Les upload sets sont donc hors service sur cette instance,")
-            print("  pas l'envoi en général. À signaler à l'équipe Panoramax.")
-            try? await client.deleteCollection(id: UUID(uuidString: collection.id) ?? UUID())
+            print("  L'envoi fonctionne sur cette instance : le refus vient donc")
+            print("  de la requête, pas du compte ni du serveur.")
+            if let id = UUID(uuidString: collection.id) {
+                try? await client.deleteCollection(id: id)
+                print("  Séquence d'essai supprimée.")
+            }
         } catch {
             print("  → refusée : \(Probe.describe(error))")
             print("  Les deux routes échouent : le problème tient au compte ou")
@@ -271,7 +291,12 @@ enum UploadProbe {
         }
     }
 
-    /// Le corps réellement envoyé, pour qu'un refus soit lisible sans deviner.
+    /// Le corps réellement envoyé.
+    ///
+    /// « Réellement » n'est pas un mot en trop : tant que le client complétait
+    /// la requête en douce, cet affichage mentait, et la bisection qu'il
+    /// guidait était sans valeur. Un outil de diagnostic qui reconstruit ce
+    /// qu'il croit avoir envoyé ne diagnostique rien.
     static func body(of request: UploadSetRequest) -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
