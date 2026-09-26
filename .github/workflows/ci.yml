@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [PanoramaxKit, ImageMetadataKit, GeoKit]
+        package: [PanoramaxKit, ImageMetadataKit, GeoKit, Persistence]
     steps:
       - uses: actions/checkout@v4
 
