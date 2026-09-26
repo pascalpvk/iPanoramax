@@ -9,9 +9,16 @@ Server Error** dès que le corps JSON contient la clé `user_agent`, **quelle qu
 soit sa valeur** — y compris la chaîne vide et `null`. La même requête sans
 cette clé est acceptée.
 
-Le champ figure pourtant dans la spécification OpenAPI de la route
-(`GeoVisioPostUploadSet`), documenté comme « Client software identifier ». Un
-client tiers qui suit la spécification est donc bloqué à la première étape d'un
+Le champ figure pourtant dans la spécification OpenAPI de la route, schéma
+`GeoVisioPostUploadSet`, décrit comme « Client software identifier ». Relevé
+dans le JSON servi par une instance (`/api/docs/specs.json`), également rendu
+sur <https://docs.panoramax.fr/backend/api/openapi/>. Le guide
+<https://docs.panoramax.fr/backend/api/api/> ne montre que `title` et
+`estimated_nb_files`, et renvoie explicitement au Swagger pour la liste
+complète — c'est donc là qu'un développeur de client va chercher, et ce qu'il y
+trouve ne fonctionne pas.
+
+Un client tiers qui suit la spécification est bloqué à la première étape d'un
 envoi.
 
 ## Environnement
@@ -106,8 +113,10 @@ Contournement actuel côté client : ne pas envoyer `user_agent`.
 
 1. Rendre le champ tolérant à `null` et à la chaîne vide, ou le rejeter avec un
    **400** explicite plutôt qu'un 500.
-2. Si le champ n'est plus pris en charge, le retirer de la spécification
-   OpenAPI de la route.
+2. Si le champ n'est plus pris en charge, le retirer du schéma
+   `GeoVisioPostUploadSet` — il reste sinon visible sur
+   <https://docs.panoramax.fr/backend/api/openapi/> et dans le Swagger de
+   chaque instance.
 3. Exposer un identifiant de requête dans les réponses 5xx, pour que les
    contributeurs puissent rattacher une erreur à une trace serveur.
 

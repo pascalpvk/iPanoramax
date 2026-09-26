@@ -9,10 +9,17 @@ Server Error** as soon as the JSON body contains a `user_agent` key —
 **whatever its value**, including the empty string and `null`. The same request
 without that key is accepted.
 
-The field is part of the route's OpenAPI specification
-(`GeoVisioPostUploadSet`), documented as "Client software identifier". A
-third-party client that follows the specification is therefore blocked at the
-very first step of an upload.
+The field is part of the route's OpenAPI specification, schema
+`GeoVisioPostUploadSet`, described as "Client software identifier". Observed in
+the JSON an instance serves at `/api/docs/specs.json`, and rendered at
+<https://docs.panoramax.fr/backend/api/openapi/>. The prose guide at
+<https://docs.panoramax.fr/backend/api/api/> shows only `title` and
+`estimated_nb_files` and points readers to the Swagger documentation for the
+full list — so that is where a client developer looks, and what they find there
+does not work.
+
+A third-party client that follows the specification is blocked at the very
+first step of an upload.
 
 ## Environment
 
@@ -105,8 +112,10 @@ Current client-side workaround: do not send `user_agent`.
 
 1. Accept `null` and the empty string, or reject the field with an explicit
    **400** rather than a 500.
-2. If the field is no longer supported, remove it from the route's OpenAPI
-   specification.
+2. If the field is no longer supported, remove it from the
+   `GeoVisioPostUploadSet` schema — otherwise it stays visible at
+   <https://docs.panoramax.fr/backend/api/openapi/> and in every instance's
+   Swagger page.
 3. Expose a request identifier in 5xx responses, so contributors can tie an
    error to a server-side trace.
 
