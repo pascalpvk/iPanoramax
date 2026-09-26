@@ -73,3 +73,17 @@ swift run panoramax-probe status e6f2fce2-47f5-40b5-aa96-c16ccdefe9b1 --delete
 > Acceptable pour un outil de mise au point sur ta propre machine ; dans
 > l'application, il va au Keychain. Ne versionne jamais ce fichier, et révoque
 > le jeton avec `logout` quand tu as fini.
+
+## Établir la reproductibilité d'un refus
+
+Avant de signaler un bug à une équipe, il faut pouvoir montrer qu'il se
+reproduit. `reproduce` envoie une matrice de corps à `POST /api/upload_sets`,
+répète chaque cas, et supprime tout ce qu'elle crée.
+
+```bash
+swift run panoramax-probe reproduce panoramax.openstreetmap.fr --repeats 3
+```
+
+Les corps sont écrits en JSON littéral dans le code, jamais construits par
+l'encodeur du client : ce qui s'affiche est exactement ce qui part. La dernière
+fois que ces deux choses ont divergé, la conclusion tirée était fausse.

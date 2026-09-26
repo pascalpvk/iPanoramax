@@ -36,6 +36,8 @@ struct Probe {
                 try await UploadProbe.run(instance: instance, host: host, arguments: arguments)
             case "status":
                 try await UploadProbe.status(instance: instance, host: host, arguments: arguments)
+            case "reproduce":
+                try await ReproduceProbe.run(instance: instance, host: host, arguments: arguments)
             case "-h", "--help", "help": printUsage()
             default:
                 printUsage()
@@ -200,6 +202,7 @@ struct Probe {
           panoramax-probe diagnose [instance]   réponses brutes, pour comprendre un refus
           panoramax-probe upload <photo.jpg> [instance] [options]
           panoramax-probe status <upload-set-id> [instance]
+          panoramax-probe reproduce [instance] [--repeats N]
 
         Options d'upload :
           --send              envoyer réellement (sans lui, essai à blanc)
