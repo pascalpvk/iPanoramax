@@ -8,8 +8,13 @@ Capture de photos géolocalisées — séquence le long d'une route ou d'un chem
 cliché unique, panoramique circulaire guidé — et publication sur l'instance
 Panoramax de votre choix.
 
-> **État du projet : phase 0, fondations.** Rien n'est encore utilisable.
-> Voir la [feuille de route](#feuille-de-route).
+> **État du projet : phases 0 et 1 closes, phase 2 en cours.**
+>
+> Le client d'API et l'écriture des métadonnées fonctionnent contre une instance
+> de production : une photo dont la position, les horodatages, le cap et
+> l'attitude sont écrits par ce code est acceptée à l'ingestion par
+> `panoramax.openstreetmap.fr`. L'application elle-même n'existe pas encore —
+> c'est l'objet de la phase 2. Voir la [feuille de route](#feuille-de-route).
 
 ## Pourquoi un client natif
 
@@ -128,8 +133,8 @@ idempotent, et une coupure réseau se rejoue sans créer de doublon.
 | Phase | Objet | Livrable |
 |---|---|---|
 | 0 ✅ | Fondations, CI, `PanoramaxKit` (config + auth) | Authentification validée contre `panoramax.openstreetmap.fr` |
-| 1 🚧 | `ImageMetadataKit` — EXIF et XMP | Photo fabriquée par le code, acceptée à l'ingestion |
-| 2 | Capture de séquence | 500 m à pied → séquence propre |
+| 1 ✅ | `ImageMetadataKit` — EXIF et XMP | Photo fabriquée par le code, acceptée à l'ingestion |
+| 2 🚧 | Capture de séquence | 500 m à pied → séquence propre |
 | 3 | Envoi fiable en tâche de fond | 200 photos envoyées, app en arrière-plan |
 | 4 | Carte MapLibre et multi-instances | Bascule OSM-FR ↔ IGN |
 | 5 | Photo unique et panoramique guidé | Un tour complet visible sur la carte |
