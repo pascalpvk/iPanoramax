@@ -9,7 +9,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 LOG="$PWD/check.log"
 
-PACKAGES=(Packages/PanoramaxKit Packages/ImageMetadataKit)
+PACKAGES=(Packages/PanoramaxKit Packages/ImageMetadataKit Packages/GeoKit)
 TOOLS=(Tools/panoramax-probe)
 
 # Le verdict doit nommer l'étape fautive. Sans cela, une section vide juste
@@ -52,7 +52,7 @@ swift_in() {
   echo "### SwiftLint"
   if command -v swiftlint >/dev/null 2>&1; then
     # --strict comme en CI : un avertissement y est bloquant.
-    if ! swiftlint lint --strict; then
+    if ! swiftlint lint --strict --quiet; then
       failures+=("SwiftLint")
     fi
   else
