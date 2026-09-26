@@ -27,9 +27,10 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) · versionnage
   `ImageMetadataKit` est acceptée à l'ingestion par cette instance.
 
 ### Connu
-- Le champ `user_agent` de `POST /api/upload_sets` fait rendre un 500 par
-  l'instance OSM-FR alors qu'il figure dans sa spécification. Non envoyé pour
-  l'instant ; à signaler au projet Panoramax.
+- La **présence** du champ `user_agent` dans le corps de
+  `POST /api/upload_sets` fait rendre un 500 par l'instance OSM-FR, quelle que
+  soit sa valeur — `null` et chaîne vide comprises — alors qu'il figure dans sa
+  spécification. Non envoyé. Rapport prêt dans `docs/rapports/`.
 - Le traitement d'une photo (floutage compris) peut rester plusieurs minutes en
   file d'attente sur une instance chargée. Ce n'est pas un échec : voir
   `panoramax-probe status`.

@@ -88,9 +88,12 @@ Réponse : `201`, en-tête `Location`, et l'UUID dans le corps.
 > figure pourtant dans la spécification OpenAPI de la route. La même requête
 > sans lui est acceptée.
 >
-> Valeur testée : `panoramax-probe (iPanoramax)` — parenthèses et espaces. On ne
-> sait pas encore si c'est le champ ou sa valeur ; l'échelon « user_agent
-> simple » de `panoramax-probe upload` le dira.
+> **C'est la présence de la clé, pas sa valeur.** Matrice de huit corps, trois
+> essais chacun, sans aucune intermittence : les six cas portant `user_agent`
+> échouent — y compris chaîne vide et `null` — et les deux témoins sans lui
+> passent. Cela écarte un problème d'échappement, de longueur ou de caractères
+> spéciaux. Détail dans `docs/rapports/2026-09-26-upload-sets-user-agent-500.md`,
+> reproductible par `panoramax-probe reproduce`.
 >
 > **iPanoramax n'envoie donc pas `user_agent`** jusqu'à ce que ce soit tranché.
 > À signaler à l'équipe Panoramax : un 500 sur un champ documenté est un bug
