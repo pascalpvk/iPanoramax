@@ -44,8 +44,8 @@ Features       Capture · Library · Upload UI · Map · Account
       ↓
 Domaine        CaptureSession · Shot · Instance · UploadJob · CaptureTrigger
       ↓
-Infrastructure PanoramaxKit · ImageMetadataKit · GeoKit
-               UploadEngine · Persistence · DesignSystem
+Infrastructure PanoramaxKit · ImageMetadataKit · GeoKit · Persistence
+               UploadEngine · DesignSystem
 ```
 
 | Module | Rôle |
@@ -55,7 +55,7 @@ Infrastructure PanoramaxKit · ImageMetadataKit · GeoKit
 | `Tools/panoramax-probe` | Sonde en ligne de commande contre une instance réelle |
 | `GeoKit` | Déclenchement, choix du cap, filtrage des positions |
 | `UploadEngine` | File d'envoi persistée, session background, reprises |
-| `Persistence` | SwiftData : sessions, clichés, tâches d'envoi |
+| `Persistence` | SwiftData : sessions et clichés ; la base ne porte que des chemins, les JPEG sont sur le disque |
 | `DesignSystem` | Jetons, composants, mode capture |
 
 L'étude complète — API Panoramax, contraintes iOS, décisions d'architecture —
