@@ -9,7 +9,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 LOG="$PWD/check.log"
 
-PACKAGES=(Packages/PanoramaxKit Packages/ImageMetadataKit)
+PACKAGES=(Packages/PanoramaxKit Packages/ImageMetadataKit Packages/GeoKit)
 TOOLS=(Tools/panoramax-probe)
 
 # Le verdict doit nommer l'étape fautive. Sans cela, une section vide juste

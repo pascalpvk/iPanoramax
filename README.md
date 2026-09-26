@@ -53,7 +53,7 @@ Infrastructure PanoramaxKit · ImageMetadataKit · GeoKit
 | `PanoramaxKit` | Client de l'API Panoramax (STAC API 1.0.0 + extensions) |
 | `ImageMetadataKit` | Écriture EXIF et injection XMP dans le JPEG |
 | `Tools/panoramax-probe` | Sonde en ligne de commande contre une instance réelle |
-| `GeoKit` | `CoreLocation`, `CoreMotion`, logique de déclenchement |
+| `GeoKit` | Déclenchement, choix du cap, filtrage des positions |
 | `UploadEngine` | File d'envoi persistée, session background, reprises |
 | `Persistence` | SwiftData : sessions, clichés, tâches d'envoi |
 | `DesignSystem` | Jetons, composants, mode capture |
