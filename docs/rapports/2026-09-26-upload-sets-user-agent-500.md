@@ -22,12 +22,16 @@ envoi.
 | Version d'API | `2.15.1-22-gf754cc9` (via `GET /api/configuration`) |
 | Route | `POST /api/upload_sets` |
 | Authentification | jeton JWT porteur, compte au rôle `user`, `tos_accepted: true` |
+| Outils | `curl` et un client Swift maison — mêmes résultats |
 | Date des essais | 26 septembre 2026 |
 
 Le même compte publie sans difficulté via l'interface web, et `POST
 /api/collections` (ancienne route d'envoi) répond normalement.
 
 ## Reproduction minimale
+
+Vérifiée en `curl`, indépendamment de tout client : `200` pour le témoin, `500`
+avec la clé `user_agent`.
 
 ```bash
 TOKEN="<votre jeton>"
@@ -75,6 +79,12 @@ Le second témoin montre que les autres champs optionnels — `estimated_nb_file
 C'est la **présence de la clé** qui déclenche l'erreur, pas son contenu. Une
 valeur vide échoue comme une valeur longue ; `null` échoue comme une chaîne.
 Cela écarte un problème d'échappement, de longueur ou de caractères spéciaux.
+
+À noter que cette route répond proprement aux autres entrées invalides : sans
+en-tête d'autorisation, elle rend un `401` accompagné de
+`{"message":"Authentication is mandatory"}`. Le 500 n'est donc pas la manière
+habituelle dont l'API signale une entrée qu'elle refuse — c'est une exception
+non rattrapée.
 
 Hypothèse, sans avoir lu le code déployé : le champ semble emprunter un chemin
 exécuté dès que la clé est présente dans la charge utile désérialisée — écriture
