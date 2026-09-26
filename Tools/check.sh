@@ -52,7 +52,7 @@ swift_in() {
   echo "### SwiftLint"
   if command -v swiftlint >/dev/null 2>&1; then
     # --strict comme en CI : un avertissement y est bloquant.
-    if ! swiftlint lint --strict; then
+    if ! swiftlint lint --strict --quiet; then
       failures+=("SwiftLint")
     fi
   else

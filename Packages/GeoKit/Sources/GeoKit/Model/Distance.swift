@@ -20,8 +20,10 @@ public enum Geodesy {
         let deltaPhi = (end.latitude - start.latitude) * .pi / 180
         let deltaLambda = (end.longitude - start.longitude) * .pi / 180
 
-        let a = sin(deltaPhi / 2) * sin(deltaPhi / 2)
+        // Carré de la demi-corde entre les deux points — le « a » de la
+        // formule de référence, nommé ici pour qui ne l'a pas sous les yeux.
+        let halfChordSquared = sin(deltaPhi / 2) * sin(deltaPhi / 2)
             + cos(phi1) * cos(phi2) * sin(deltaLambda / 2) * sin(deltaLambda / 2)
-        return 2 * earthRadius * atan2(sqrt(a), sqrt(1 - a))
+        return 2 * earthRadius * atan2(sqrt(halfChordSquared), sqrt(1 - halfChordSquared))
     }
 }
