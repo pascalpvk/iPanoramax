@@ -1,100 +1,372 @@
 === iPanoramax — vérification locale ===
-2026-09-13 21:45:17
+2026-09-26 23:35:47
 
 ### swift --version
-swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+swift-driver version: 1.168.6 Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
 Target: arm64-apple-macosx26.0
 
 ### PanoramaxKit — build
-[0/1] Planning build
 Building for debugging...
-[0/1] Write swift-version--58304C5D6DBC2206.txt
-Build complete! (0.61s)
+[2 / 6] PanoramaxKit
+Build complete! (0,59 s)
 
 ### PanoramaxKit — tests
-[0/1] Planning build
 Building for debugging...
-[0/3] Write sources
-[1/3] Write swift-version--58304C5D6DBC2206.txt
-[3/8] Compiling PanoramaxKitTests AuthAPITests.swift
-[4/8] Compiling PanoramaxKitTests MockURLProtocol.swift
-[5/8] Compiling PanoramaxKitTests UploadSetsAPITests.swift
-[6/8] Compiling PanoramaxKitTests MultipartBodyBuilderTests.swift
-[7/8] Emitting module PanoramaxKitTests
-[7/9] Write Objects.LinkFileList
-[8/9] Linking PanoramaxKitPackageTests
-Build complete! (7.41s)
-Test Suite 'All tests' started at 2026-09-13 21:45:34.836.
-Test Suite 'All tests' passed at 2026-09-13 21:45:34.913.
-	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.076) seconds
+Build complete! (0,43 s)
+Test Suite 'All tests' started at 2026-09-26 23:35:53.561.
+Test Suite 'All tests' passed at 2026-09-26 23:35:53.567.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
 ◇ Test run started.
-↳ Testing Library Version: 1902
+↳ Testing Library Version: 2084
 ↳ Target Platform: arm64e-apple-macos14.0
-◇ Suite "Configuration d'instance" started.
-◇ Suite "Résolution d'instance" started.
 ◇ Suite "Préparation d'un envoi" started.
-◇ Suite "Corps multipart" started.
+◇ Suite "Upload sets" started.
 ◇ Suite "Authentification" started.
+◇ Suite "Résolution d'instance" started.
+◇ Suite "Configuration d'instance" started.
+◇ Suite "Corps multipart" started.
+◇ Test "Décode la réponse réelle d'OSM-FR juste après un envoi" started.
+◇ Test "Le motif de refus d'un fichier est conservé" started.
+◇ Test "Un 429 remonte le délai de réessai" started.
+◇ Test "Un 403 vaut aussi « pas encore revendiqué » — c'est ce que rend OSM-FR" started.
+◇ Test "L'attente de revendication s'arrête dès que le serveur répond 200" started.
+◇ Test "Une requête authentifiée porte le jeton en Bearer" started.
+◇ Test "L'état d'un upload set est décodé, fractions de seconde comprises" started.
+◇ Test "La suppression d'une séquence vise DELETE /collections/{id}" started.
+◇ Test "Un jeton jamais revendiqué finit en tokenNotClaimed" started.
 ◇ Test "Complète les URL saisies par l'utilisateur" started.
 ◇ Test "Rejette une saisie vide" started.
-◇ Suite "Upload sets" started.
-◇ Test "Rend la couverture géographique dans la langue demandée" started.
-◇ Test "La requête et le corps sur disque sont prêts pour une session background" started.
-◇ Test "Le corps respecte le cadrage multipart et préserve le fichier octet pour octet" started.
-◇ Test "Décode la configuration de l'instance IGN" started.
-◇ Test case passing 1 argument input → "panoramax.openstreetmap.fr" to "Complète les URL saisies par l'utilisateur" started.
-◇ Test "Un gros fichier est recopié en flux, sans perte ni troncature" started.
 ◇ Test "Seules les erreurs transitoires sont rejouables" started.
-◇ Test case passing 1 argument input → "https://panoramax.openstreetmap.fr" to "Complète les URL saisies par l'utilisateur" started.
-◇ Test case passing 1 argument input → "https://panoramax.openstreetmap.fr/api" to "Complète les URL saisies par l'utilisateur" started.
-◇ Test case passing 1 argument input → "https://panoramax.openstreetmap.fr/" to "Complète les URL saisies par l'utilisateur" started.
-◇ Test "Écrire deux fois au même endroit écrase proprement" started.
-◇ Test "Un jeton jamais revendiqué finit en tokenNotClaimed" started.
-◇ Test "Le jeton est généré sans authentification, puis mémorisé" started.
-◇ Test "L'attente de revendication s'arrête dès que le serveur répond 200" started.
-◇ Test "La clôture vise bien /complete" started.
-◇ Test "Un 429 remonte le délai de réessai" started.
-◇ Test "Une requête authentifiée porte le jeton en Bearer" started.
 ◇ Test "Les champs partent en snake_case, les valeurs absentes sont omises" started.
-◇ Test "L'état d'un upload set est décodé, fractions de seconde comprises" started.
-◇ Test "Le motif de refus d'un fichier est conservé" started.
-✔ Test "Rejette une saisie vide" passed after 0.142 seconds.
-✔ Test "Complète les URL saisies par l'utilisateur" with 4 test cases passed after 0.142 seconds.
-✔ Test "Seules les erreurs transitoires sont rejouables" passed after 0.142 seconds.
-✔ Test "Décode la configuration de l'instance IGN" passed after 0.143 seconds.
-✔ Test "Rend la couverture géographique dans la langue demandée" passed after 0.143 seconds.
-✔ Suite "Résolution d'instance" passed after 0.143 seconds.
-✔ Suite "Configuration d'instance" passed after 0.143 seconds.
-✔ Test "Le motif de refus d'un fichier est conservé" passed after 0.148 seconds.
-✔ Test "Une requête authentifiée porte le jeton en Bearer" passed after 0.149 seconds.
-✔ Test "La clôture vise bien /complete" passed after 0.164 seconds.
-✔ Test "L'état d'un upload set est décodé, fractions de seconde comprises" passed after 0.165 seconds.
-✔ Test "Le jeton est généré sans authentification, puis mémorisé" passed after 0.166 seconds.
-✔ Test "Les champs partent en snake_case, les valeurs absentes sont omises" passed after 0.166 seconds.
-✔ Suite "Upload sets" passed after 0.167 seconds.
-✔ Test "Un 429 remonte le délai de réessai" passed after 0.166 seconds.
-✔ Test "L'attente de revendication s'arrête dès que le serveur répond 200" passed after 0.175 seconds.
-✔ Test "Le corps respecte le cadrage multipart et préserve le fichier octet pour octet" passed after 0.178 seconds.
-✔ Test "Un gros fichier est recopié en flux, sans perte ni troncature" passed after 0.184 seconds.
-✔ Test "Un jeton jamais revendiqué finit en tokenNotClaimed" passed after 0.190 seconds.
-✔ Suite "Authentification" passed after 0.191 seconds.
-✔ Test "La requête et le corps sur disque sont prêts pour une session background" passed after 0.212 seconds.
-✔ Suite "Préparation d'un envoi" passed after 0.212 seconds.
-✔ Test "Écrire deux fois au même endroit écrase proprement" passed after 0.216 seconds.
-✔ Suite "Corps multipart" passed after 0.216 seconds.
-✔ Test run with 18 tests in 6 suites passed after 0.217 seconds.
+◇ Test "Le user_agent n'est envoyé que si l'appelant le demande" started.
+◇ Test "Le jeton est généré sans authentification, puis mémorisé" started.
+◇ Test "La requête et le corps sur disque sont prêts pour une session background" started.
+◇ Test "La clôture vise bien /complete" started.
+◇ Test "Décode la configuration de l'instance IGN" started.
+◇ Test "Rend la couverture géographique dans la langue demandée" started.
+◇ Test case passing 1 argument input → "https://panoramax.openstreetmap.fr/" to "Complète les URL saisies par l'utilisateur" started.
+◇ Test case passing 1 argument input → "https://panoramax.openstreetmap.fr" to "Complète les URL saisies par l'utilisateur" started.
+◇ Test case passing 1 argument input → "panoramax.openstreetmap.fr" to "Complète les URL saisies par l'utilisateur" started.
+◇ Test case passing 1 argument input → "https://panoramax.openstreetmap.fr/api" to "Complète les URL saisies par l'utilisateur" started.
+◇ Test "Un gros fichier est recopié en flux, sans perte ni troncature" started.
+◇ Test "Écrire deux fois au même endroit écrase proprement" started.
+◇ Test "Le corps respecte le cadrage multipart et préserve le fichier octet pour octet" started.
+✔ Test "Décode la réponse réelle d'OSM-FR juste après un envoi" passed after 0.013 seconds.
+✔ Test "Seules les erreurs transitoires sont rejouables" passed after 0.013 seconds.
+✔ Test "Complète les URL saisies par l'utilisateur" with 4 test cases passed after 0.013 seconds.
+✔ Test "Rejette une saisie vide" passed after 0.013 seconds.
+✔ Suite "Résolution d'instance" passed after 0.014 seconds.
+✔ Test "Rend la couverture géographique dans la langue demandée" passed after 0.015 seconds.
+✔ Test "Décode la configuration de l'instance IGN" passed after 0.015 seconds.
+✔ Suite "Configuration d'instance" passed after 0.016 seconds.
+✔ Test "Une requête authentifiée porte le jeton en Bearer" passed after 0.019 seconds.
+✔ Test "La clôture vise bien /complete" passed after 0.019 seconds.
+✔ Test "Le jeton est généré sans authentification, puis mémorisé" passed after 0.019 seconds.
+✔ Test "L'état d'un upload set est décodé, fractions de seconde comprises" passed after 0.019 seconds.
+✔ Test "La suppression d'une séquence vise DELETE /collections/{id}" passed after 0.019 seconds.
+✔ Test "Le motif de refus d'un fichier est conservé" passed after 0.019 seconds.
+✔ Test "Les champs partent en snake_case, les valeurs absentes sont omises" passed after 0.019 seconds.
+✔ Test "Le user_agent n'est envoyé que si l'appelant le demande" passed after 0.019 seconds.
+✔ Suite "Upload sets" passed after 0.020 seconds.
+✔ Test "La requête et le corps sur disque sont prêts pour une session background" passed after 0.019 seconds.
+✔ Suite "Préparation d'un envoi" passed after 0.020 seconds.
+✔ Test "Le corps respecte le cadrage multipart et préserve le fichier octet pour octet" passed after 0.006 seconds.
+✔ Test "Un 429 remonte le délai de réessai" passed after 0.021 seconds.
+✔ Test "Écrire deux fois au même endroit écrase proprement" passed after 0.008 seconds.
+✔ Test "Un gros fichier est recopié en flux, sans perte ni troncature" passed after 0.008 seconds.
+✔ Suite "Corps multipart" passed after 0.022 seconds.
+✔ Test "L'attente de revendication s'arrête dès que le serveur répond 200" passed after 0.032 seconds.
+✔ Test "Un 403 vaut aussi « pas encore revendiqué » — c'est ce que rend OSM-FR" passed after 0.032 seconds.
+✔ Test "Un jeton jamais revendiqué finit en tokenNotClaimed" passed after 0.065 seconds.
+✔ Suite "Authentification" passed after 0.065 seconds.
+✔ Test run with 22 tests in 6 suites passed after 0.066 seconds.
+
+### ImageMetadataKit — build
+Building for debugging...
+[1 / 6]
+Build complete! (0,40 s)
+
+### ImageMetadataKit — tests
+Building for debugging...
+[1 / 9]
+Build complete! (0,43 s)
+Test Suite 'All tests' started at 2026-09-26 23:35:57.770.
+Test Suite 'All tests' passed at 2026-09-26 23:35:57.772.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Aller-retour dans un JPEG" started.
+◇ Suite "Dictionnaire EXIF" started.
+◇ Suite "Horodatages EXIF" started.
+◇ Suite "Analyse des segments JPEG" started.
+◇ Suite "Injection XMP dans le JPEG" started.
+◇ Suite "Paquet XMP" started.
+◇ Test "Un cap absent n'écrit aucune direction — mieux vaut rien qu'un cap faux" started.
+◇ Test "La précision horizontale est reportée telle quelle" started.
+◇ Test "L'appareil et l'optique atterrissent dans les bons blocs" started.
+◇ Test "La vitesse est convertie en km/h" started.
+◇ Test "GPSTrack n'est rempli que si le cap vient du déplacement" started.
+◇ Test "Un cap est ramené dans 0..<360" started.
+◇ Test "Ce qui est écrit se relit" started.
+◇ Test "Les propriétés déjà présentes sont conservées" started.
+◇ Test "L'image n'est pas recompressée et garde ses dimensions" started.
+◇ Test "L'altitude sous le niveau de la mer passe par la référence 1" started.
+◇ Test "Des octets qui ne sont pas une image sont refusés proprement" started.
+◇ Test "La position part en valeur absolue, le signe dans la référence" started.
+◇ Test "Un fuseau à l'ouest de Greenwich porte un décalage négatif" started.
+◇ Test "GPSDateStamp et GPSTimeStamp sont en UTC" started.
+◇ Test "Le décalage suit l'heure d'hiver" started.
+◇ Test "DateTimeOriginal est en heure locale, accompagné de son décalage" started.
+◇ Test "Les étendues rendues restent valides sur une Data réindexée" started.
+◇ Test "Le parcours s'arrête au début des données compressées" started.
+◇ Test "Les sous-secondes tiennent sur trois chiffres" started.
+◇ Test "Un fichier tronqué au milieu d'un segment est signalé" started.
+◇ Test "Le paquet déclare l'espace de noms attendu par exiv2" started.
+◇ Test "Les angles s'écrivent avec un point décimal, pas une virgule" started.
+◇ Test "Un paquet trop gros pour un segment est refusé, pas tronqué" started.
+◇ Test "Le nom de l'outil est échappé" started.
+◇ Test "Sans attitude, aucun paquet — un segment vide n'apporte que du poids" started.
+◇ Test "Le chemin complet écrit EXIF et XMP en une passe" started.
+◇ Test "L'injection ne casse ni l'image ni son EXIF" started.
+◇ Test "Une seconde injection remplace au lieu de dupliquer" started.
+◇ Test "Le XMP se place après les segments applicatifs de tête, pas avant" started.
+◇ Test "Ce qui est injecté se relit à l'octet près" started.
+◇ Test "Des octets qui ne sont pas un JPEG sont refusés" started.
+✔ Test "Un cap est ramené dans 0..<360" passed after 0.002 seconds.
+✔ Test "Les propriétés déjà présentes sont conservées" passed after 0.002 seconds.
+✔ Test "La vitesse est convertie en km/h" passed after 0.002 seconds.
+✔ Test "La précision horizontale est reportée telle quelle" passed after 0.002 seconds.
+✔ Test "L'altitude sous le niveau de la mer passe par la référence 1" passed after 0.002 seconds.
+✔ Test "GPSTrack n'est rempli que si le cap vient du déplacement" passed after 0.003 seconds.
+✔ Test "Un cap absent n'écrit aucune direction — mieux vaut rien qu'un cap faux" passed after 0.003 seconds.
+✔ Test "La position part en valeur absolue, le signe dans la référence" passed after 0.013 seconds.
+✔ Test "GPSDateStamp et GPSTimeStamp sont en UTC" passed after 0.014 seconds.
+✔ Test "Un fuseau à l'ouest de Greenwich porte un décalage négatif" passed after 0.014 seconds.
+✔ Test "DateTimeOriginal est en heure locale, accompagné de son décalage" passed after 0.014 seconds.
+✔ Test "L'appareil et l'optique atterrissent dans les bons blocs" passed after 0.014 seconds.
+✔ Test "Le décalage suit l'heure d'hiver" passed after 0.014 seconds.
+✔ Test "Les sous-secondes tiennent sur trois chiffres" passed after 0.014 seconds.
+✔ Test "Le paquet déclare l'espace de noms attendu par exiv2" passed after 0.012 seconds.
+✔ Test "Sans attitude, aucun paquet — un segment vide n'apporte que du poids" passed after 0.012 seconds.
+✔ Test "Les angles s'écrivent avec un point décimal, pas une virgule" passed after 0.012 seconds.
+✔ Test "Le nom de l'outil est échappé" passed after 0.012 seconds.
+✔ Test "Le parcours s'arrête au début des données compressées" passed after 0.014 seconds.
+✔ Test "Les étendues rendues restent valides sur une Data réindexée" passed after 0.014 seconds.
+✔ Test "Une seconde injection remplace au lieu de dupliquer" passed after 0.012 seconds.
+✔ Test "Un fichier tronqué au milieu d'un segment est signalé" passed after 0.014 seconds.
+✔ Test "Un paquet trop gros pour un segment est refusé, pas tronqué" passed after 0.013 seconds.
+✔ Test "Des octets qui ne sont pas un JPEG sont refusés" passed after 0.012 seconds.
+✔ Test "Ce qui est injecté se relit à l'octet près" passed after 0.012 seconds.
+✔ Suite "Dictionnaire EXIF" passed after 0.015 seconds.
+✔ Suite "Horodatages EXIF" passed after 0.015 seconds.
+✔ Suite "Paquet XMP" passed after 0.014 seconds.
+✔ Suite "Analyse des segments JPEG" passed after 0.014 seconds.
+✔ Test "Des octets qui ne sont pas une image sont refusés proprement" passed after 0.015 seconds.
+✔ Test "Le XMP se place après les segments applicatifs de tête, pas avant" passed after 0.016 seconds.
+✔ Test "Ce qui est écrit se relit" passed after 0.020 seconds.
+✔ Test "L'image n'est pas recompressée et garde ses dimensions" passed after 0.020 seconds.
+✔ Suite "Aller-retour dans un JPEG" passed after 0.021 seconds.
+✔ Test "Le chemin complet écrit EXIF et XMP en une passe" passed after 0.023 seconds.
+✔ Test "L'injection ne casse ni l'image ni son EXIF" passed after 0.023 seconds.
+✔ Suite "Injection XMP dans le JPEG" passed after 0.025 seconds.
+✔ Test run with 31 tests in 6 suites passed after 0.025 seconds.
+
+### GeoKit — build
+Building for debugging...
+[1 / 8]
+[2 / 7] GeoKit
+[4 / 9] GeoKit
+Build complete! (1,42 s)
+
+### GeoKit — tests
+Building for debugging...
+[1 / 13]
+Build complete! (0,55 s)
+Test Suite 'All tests' started at 2026-09-26 23:36:02.621.
+Test Suite 'All tests' passed at 2026-09-26 23:36:02.628.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.007) seconds
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Choix du cap" started.
+◇ Suite "Déclenchement" started.
+◇ Suite "Filtrage des positions" started.
+◇ Suite "Distances" started.
+◇ Suite "Assemblage des métadonnées" started.
+◇ Test "Le mode temps déclenche même immobile" started.
+◇ Test "Sans source fiable, aucun cap n'est écrit" started.
+◇ Test "Le plancher d'intervalle protège des cadences intenables" started.
+◇ Test "À l'arrêt, le mode distance ne déclenche qu'une fois" started.
+◇ Test "Le mode manuel ne déclenche jamais tout seul" started.
+◇ Test "Une boussole trop incertaine n'est pas utilisée" started.
+◇ Test "Une position trop ancienne est écartée" started.
+◇ Test "À l'arrêt, la boussole l'emporte — une route GPS immobile dérive" started.
+◇ Test "La première position déclenche toujours" started.
+◇ Test "Le seuil est inclusif" started.
+◇ Test "La progression indique ce qu'il reste à parcourir" started.
+◇ Test "La remise à zéro repart d'une séquence vierge" started.
+◇ Test "Au pas de marche, la boussole reste la meilleure source" started.
+◇ Test "Position, horodatage et cap arrivent dans les métadonnées" started.
+◇ Test "Une position précise et fraîche est acceptée" started.
+◇ Test "Un point avec lui-même est à distance nulle" started.
+◇ Test "En mouvement, la route GPS l'emporte sur la boussole" started.
+◇ Test "Une vitesse inconnue ne vaut pas une vitesse nulle" started.
+◇ Test "Marche à 1,4 m/s, une photo tous les 5 m" started.
+◇ Test "Cent mètres de trace synthétique en font bien cent" started.
+◇ Test "Une précision négative signale une position inexploitable" started.
+◇ Test "La distance est symétrique" started.
+◇ Test "Au-delà du seuil de précision, on s'abstient" started.
+◇ Test "Une précision ou une vitesse inconnue n'est pas inventée" started.
+◇ Test "Un degré de latitude fait environ 111 km" started.
+✔ Test "Le mode temps déclenche même immobile" passed after 0.001 seconds.
+✔ Test "À l'arrêt, le mode distance ne déclenche qu'une fois" passed after 0.001 seconds.
+✔ Test "Une boussole trop incertaine n'est pas utilisée" passed after 0.001 seconds.
+✔ Test "À l'arrêt, la boussole l'emporte — une route GPS immobile dérive" passed after 0.001 seconds.
+✔ Test "Le plancher d'intervalle protège des cadences intenables" passed after 0.001 seconds.
+✔ Test "La progression indique ce qu'il reste à parcourir" passed after 0.001 seconds.
+✔ Test "La première position déclenche toujours" passed after 0.001 seconds.
+✔ Test "La remise à zéro repart d'une séquence vierge" passed after 0.001 seconds.
+✔ Test "Sans source fiable, aucun cap n'est écrit" passed after 0.001 seconds.
+✔ Test "Le seuil est inclusif" passed after 0.001 seconds.
+✔ Test "Le mode manuel ne déclenche jamais tout seul" passed after 0.001 seconds.
+✔ Test "Un point avec lui-même est à distance nulle" passed after 0.001 seconds.
+✔ Test "Une position précise et fraîche est acceptée" passed after 0.001 seconds.
+✔ Test "Une position trop ancienne est écartée" passed after 0.001 seconds.
+✔ Test "Une précision négative signale une position inexploitable" passed after 0.001 seconds.
+✔ Test "La distance est symétrique" passed after 0.001 seconds.
+✔ Test "Cent mètres de trace synthétique en font bien cent" passed after 0.001 seconds.
+✔ Test "En mouvement, la route GPS l'emporte sur la boussole" passed after 0.001 seconds.
+✔ Test "Au pas de marche, la boussole reste la meilleure source" passed after 0.001 seconds.
+✔ Test "Au-delà du seuil de précision, on s'abstient" passed after 0.001 seconds.
+✔ Test "Une vitesse inconnue ne vaut pas une vitesse nulle" passed after 0.001 seconds.
+✔ Test "Marche à 1,4 m/s, une photo tous les 5 m" passed after 0.001 seconds.
+✔ Test "Un degré de latitude fait environ 111 km" passed after 0.001 seconds.
+✔ Suite "Filtrage des positions" passed after 0.001 seconds.
+✔ Suite "Choix du cap" passed after 0.001 seconds.
+✔ Suite "Distances" passed after 0.001 seconds.
+✔ Suite "Déclenchement" passed after 0.001 seconds.
+✔ Test "Position, horodatage et cap arrivent dans les métadonnées" passed after 0.001 seconds.
+✔ Test "Une précision ou une vitesse inconnue n'est pas inventée" passed after 0.001 seconds.
+✔ Suite "Assemblage des métadonnées" passed after 0.001 seconds.
+✔ Test run with 25 tests in 5 suites passed after 0.002 seconds.
+
+### Persistence — build
+Building for debugging...
+[Pre-planning 1 / 126]
+[Planning deferred tasks]
+[31 / 56]
+[32 / 57] ImageMetadataKit
+[40 / 105]
+[42 / 105]
+[44 / 105]
+[49 / 105]
+[50 / 105]
+[51 / 105]
+[54 / 105]
+[55 / 105]
+[57 / 105]
+[58 / 105]
+[60 / 105]
+[63 / 105]
+[65 / 105]
+[67 / 105]
+[68 / 105]
+[72 / 105]
+[73 / 105]
+[80 / 105] ImageMetadataKit
+[87 / 106] GeoKit
+[89 / 113] GeoKit
+[90 / 113] GeoKit
+[101 / 114] GeoKit
+[102 / 114] ImageMetadataKit
+[113 / 123] Persistence
+[114 / 123] Persistence
+[120 / 123] Persistence
+Build complete! (13,37 s)
+
+### Persistence — tests
+Building for debugging...
+[Pre-planning 1 / 155]
+[Planning deferred tasks]
+[12 / 25] PersistenceTests-product
+[15 / 26] PersistenceTests-product
+[16 / 35]
+[17 / 35]
+[24 / 35] PersistenceTests-product
+[29 / 35] PersistenceTests-product
+[31 / 35] PersistenceTests-product
+[32 / 35] PersistenceTests-product
+Build complete! (2,96 s)
+Test Suite 'All tests' started at 2026-09-26 23:36:25.530.
+Test Suite 'All tests' passed at 2026-09-26 23:36:25.537.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.006) seconds
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Bibliothèque — base et disque" started.
+◇ Suite "Schéma" started.
+◇ Suite "Magasin — sessions" started.
+◇ Suite "Magasin — clichés" started.
+◇ Test "Supprimer un cliché efface les deux côtés" started.
+◇ Test "Le fichier porte le nom du picture_id" started.
+◇ Test "Un cliché enregistré laisse un fichier et une ligne" started.
+◇ Test "Le balayage n'emporte que les fichiers sans ligne" started.
+◇ Test "Un conteneur en mémoire se crée sans toucher au disque" started.
+◇ Test "Le schéma est estampillé et porte les deux entités" started.
+◇ Test "Recréer la même session ne la dédouble pas" started.
+◇ Test "Une inscription refusée ne laisse pas de fichier derrière elle" started.
+◇ Test "Supprimer une session rend les clichés à effacer" started.
+◇ Test "Supprimer une session vide son dossier" started.
+◇ Test "Les rangs se suivent dans l'ordre d'inscription" started.
+◇ Test "Position, altitude, précision et cap se relisent tels quels" started.
+◇ Test "Ce qui est écrit se relit après réouverture de la base" started.
+◇ Test "Un cliché sans cap reste sans cap" started.
+◇ Test "Les sessions arrivent de la plus récente à la plus ancienne" started.
+◇ Test "Les trois modes de déclenchement se relisent tels quels" started.
+◇ Test "Rattacher un upload set fait passer la session en envoi" started.
+◇ Test "Clore une session l'horodate et la déclare prête" started.
+◇ Test "Une session se retrouve par son identifiant" started.
+◇ Test "Réinscrire le même cliché ne crée pas de doublon" started.
+◇ Test "La file d'envoi ignore ce qui est déjà parti" started.
+◇ Test "Un motif de refus disparaît quand le cliché n'est plus refusé" started.
+◇ Test "Inscrire dans une session inconnue échoue explicitement" started.
+◇ Test "Un rang libéré par une suppression n'est pas réattribué" started.
+✔ Test "Le schéma est estampillé et porte les deux entités" passed after 0.199 seconds.
+✔ Test "Un conteneur en mémoire se crée sans toucher au disque" passed after 0.199 seconds.
+✔ Test "Une inscription refusée ne laisse pas de fichier derrière elle" passed after 0.297 seconds.
+✔ Test "Inscrire dans une session inconnue échoue explicitement" passed after 0.318 seconds.
+✔ Test "Recréer la même session ne la dédouble pas" passed after 0.318 seconds.
+✔ Test "Le fichier porte le nom du picture_id" passed after 0.319 seconds.
+✔ Test "Clore une session l'horodate et la déclare prête" passed after 0.318 seconds.
+✔ Test "Un cliché enregistré laisse un fichier et une ligne" passed after 0.320 seconds.
+✔ Test "Les sessions arrivent de la plus récente à la plus ancienne" passed after 0.320 seconds.
+✔ Test "Position, altitude, précision et cap se relisent tels quels" passed after 0.320 seconds.
+✔ Test "Rattacher un upload set fait passer la session en envoi" passed after 0.320 seconds.
+✔ Test "Une session se retrouve par son identifiant" passed after 0.322 seconds.
+✔ Test "Le balayage n'emporte que les fichiers sans ligne" passed after 0.326 seconds.
+✔ Test "Réinscrire le même cliché ne crée pas de doublon" passed after 0.326 seconds.
+✔ Test "Un cliché sans cap reste sans cap" passed after 0.326 seconds.
+✔ Test "Supprimer une session rend les clichés à effacer" passed after 0.327 seconds.
+✔ Test "Les trois modes de déclenchement se relisent tels quels" passed after 0.332 seconds.
+✔ Suite "Magasin — sessions" passed after 0.332 seconds.
+✔ Test "Supprimer un cliché efface les deux côtés" passed after 0.332 seconds.
+✔ Test "Les rangs se suivent dans l'ordre d'inscription" passed after 0.332 seconds.
+✔ Test "La file d'envoi ignore ce qui est déjà parti" passed after 0.332 seconds.
+✔ Test "Un motif de refus disparaît quand le cliché n'est plus refusé" passed after 0.334 seconds.
+✔ Test "Un rang libéré par une suppression n'est pas réattribué" passed after 0.337 seconds.
+✔ Suite "Magasin — clichés" passed after 0.338 seconds.
+✔ Test "Supprimer une session vide son dossier" passed after 0.339 seconds.
+✔ Suite "Bibliothèque — base et disque" passed after 0.339 seconds.
+✔ Test "Ce qui est écrit se relit après réouverture de la base" passed after 0.340 seconds.
+✔ Suite "Schéma" passed after 0.341 seconds.
+✔ Test run with 24 tests in 4 suites passed after 0.341 seconds.
 
 ### panoramax-probe — build
-[0/1] Planning build
 Building for debugging...
-[0/3] Write swift-version--58304C5D6DBC2206.txt
-Build complete! (0.70s)
+[1 / 1]
+Build complete! (0,44 s)
 
 ### SwiftLint
-/Users/pvuylstker/git/iPanoramax/Packages/PanoramaxKit/Sources/PanoramaxKit/Configuration/InstanceConfiguration.swift:34:9: warning: Nesting Violation: Types should be nested at most 1 level deep (nesting)
-/Users/pvuylstker/git/iPanoramax/Packages/PanoramaxKit/Sources/PanoramaxKit/Configuration/InstanceConfiguration.swift:56:9: warning: Nesting Violation: Types should be nested at most 1 level deep (nesting)
-/Users/pvuylstker/git/iPanoramax/Packages/PanoramaxKit/Sources/PanoramaxKit/Configuration/InstanceConfiguration.swift:68:9: warning: Nesting Violation: Types should be nested at most 1 level deep (nesting)
-/Users/pvuylstker/git/iPanoramax/Packages/PanoramaxKit/Tests/PanoramaxKitTests/Support/MockURLProtocol.swift:147:5: warning: Static Over Final Class Violation: Prefer `static` over `class` in a final class (static_over_final_class)
-/Users/pvuylstker/git/iPanoramax/Packages/PanoramaxKit/Tests/PanoramaxKitTests/Support/MockURLProtocol.swift:149:5: warning: Static Over Final Class Violation: Prefer `static` over `class` in a final class (static_over_final_class)
 
 RESULTAT: OK
